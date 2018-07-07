@@ -1,0 +1,42 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "video-concat",
+  "author": "yuki-toida",
+  "scripts": {
+    "watch": "webpack --mode development --watch --color",
+    "deploy": "webpack --mode production"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "copy-webpack-plugin": "^4.5.2",
+    "css-loader": "^0.28.11",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.9.1",
+    "eslint-plugin-vue": "^4.5.0",
+    "style-loader": "^0.21.0",
+    "vue-loader": "^15.2.4",
+    "vue-router": "^3.0.1",
+    "vue-style-loader": "^4.1.0",
+    "vue-template-compiler": "^2.5.16",
+    "webpack": "^4.10.2",
+    "webpack-cli": "^2.1.4"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "bootstrap": "^4.1.1",
+    "firebase": "^5.2.0",
+    "jquery": "^3.3.1",
+    "popper.js": "^1.14.3",
+    "vue": "^2.5.16",
+    "vue-simple-calendar": "^3.0.2",
+    "vuex": "^3.0.1"
+  }
+}

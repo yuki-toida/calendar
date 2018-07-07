@@ -1,0 +1,15 @@
+version: '2'
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: knowme
+    hostname: knowme
+    ports:
+      - "7306:3306"
+    environment:
+      - "MYSQL_USER=root"
+      - "MYSQL_ROOT_PASSWORD=zaqroot"
+      - "MYSQL_DATABASE=knowme"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/config:/etc/mysql/conf.d
