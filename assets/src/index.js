@@ -9,6 +9,30 @@ import http from './http';
 
 Vue.use(Vuex);
 
+function createStore(data) {
+  return new Vuex.Store({
+    strict: false,
+    state: {
+      staticUrl: data.staticUrl,
+      emailDomain: data.emailDomain,
+      events: data.events,
+      user: data.user,
+    },
+    getters: {
+      isSignIn: state => state.user.id,
+    },
+    mutations: {
+      addEvent(state, payload) {
+        state.events.push(payload);
+      },
+      removeEvent(state, payload) {
+        const event = state.events.find(x => x.id === payload.id);
+        state.events.splice(state.events.indexOf(event), 1);
+      },
+    },
+  });
+}
+
 // Initialize Firebase
 firebase.initializeApp({
   apiKey: 'AIzaSyCMtszkhNgnTODhCKTw9cz5hDVPaOdkv68',
@@ -25,30 +49,12 @@ firebase.auth().onAuthStateChanged((user) => {
   const name = googleUser ? googleUser.displayName : null;
   const photo = googleUser ? googleUser.photoURL : null;
   http.post('/init', { email, name, photo }).then((data) => {
-    console.log(data);
-    const store = new Vuex.Store({
-      strict: false,
-      state: {
-        user: data.user,
-        staticUrl: data.staticUrl,
-        events: data.events,
-      },
-      mutations: {
-        addEvent(state, payload) {
-          state.events.push(payload);
-        },
-        removeEvent(state, payload) {
-          const ev = state.events.find(x => x.id === payload.id);
-          state.events.splice(state.events.indexOf(ev), 1);
-        },
-      },
-    });
     new Vue({
       el: '#app',
       router,
       components: { app },
       render: h => h(app),
-      store,
+      store: createStore(data),
     });
   });
 });

@@ -1,5 +1,17 @@
 import axios from 'axios';
 
+function handle(res, resolve) {
+  if (res.data) {
+    if (res.data.error) {
+      console.log(res.data.error);
+    } else {
+      resolve(res.data);
+    }
+  } else {
+    console.log(res);
+  }
+}
+
 class Http {
   constructor() {
     this.domain = process.env.NODE_ENV === 'development'
@@ -10,13 +22,7 @@ class Http {
   get(path) {
     return new Promise((resolve) => {
       axios.get(`${this.domain}${path}`)
-        .then((res) => {
-          if (res.data) {
-            resolve(res.data);
-          } else {
-            console.log(res);
-          }
-        })
+        .then(res => handle(res, resolve))
         .catch(error => console.log(error));
     });
   }
@@ -24,13 +30,7 @@ class Http {
   delete(path) {
     return new Promise((resolve) => {
       axios.delete(`${this.domain}${path}`)
-        .then((res) => {
-          if (res.data) {
-            resolve(res.data);
-          } else {
-            console.log(res);
-          }
-        })
+        .then(res => handle(res, resolve))
         .catch(error => console.log(error));
     });
   }
@@ -38,13 +38,7 @@ class Http {
   post(path, data) {
     return new Promise((resolve) => {
       axios.post(`${this.domain}${path}`, data)
-        .then((res) => {
-          if (res.data) {
-            resolve(res.data);
-          } else {
-            console.log(res);
-          }
-        })
+        .then(res => handle(res, resolve))
         .catch(error => console.log(error));
     });
   }
@@ -52,13 +46,7 @@ class Http {
   put(path, data) {
     return new Promise((resolve) => {
       axios.put(`${this.domain}${path}`, data)
-        .then((res) => {
-          if (res.data) {
-            resolve(res.data);
-          } else {
-            console.log(res);
-          }
-        })
+        .then(res => handle(res, resolve))
         .catch(error => console.log(error));
     });
   }

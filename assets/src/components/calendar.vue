@@ -29,22 +29,24 @@ export default {
       this.showDate = date;
     },
     clickDate(date) {
-      http.post('/', {
-        userId: this.$store.state.user.id,
-        date: date,
-      })
-      .then((data) => {
-        this.$store.commit('addEvent', data.event);
-      })
+      if (this.$store.getters.isSignIn) {
+        http.post('/', {userId: this.$store.state.user.id, date: date})
+        .then((data) => {
+          this.$store.commit('addEvent', data.event);
+        })
+      } else {
+        console.log("please sign in");
+      }
     },
     clickEvent(event) {
-      http.put('/', {
-        id: event.id,
-        date: event.startDate,
-      })
-      .then((_) => {
-        this.$store.commit('removeEvent', event);
-      })
+      if (this.$store.getters.isSignIn) {
+        http.put('/', {id: event.id, date: event.startDate})
+        .then((data) => {
+          this.$store.commit('removeEvent', event);
+        })
+      } else {
+        console.log("please sign in");
+      }
     },
   }
 }
