@@ -1,27 +1,47 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+
 	"github.com/yuki-toida/knowme/config"
 	"github.com/yuki-toida/knowme/model"
 )
 
-// CalendarHealthz func
-func CalendarHealthz(c *gin.Context) {
+const sessionName = "UserID"
+
+// Healthz func
+func Healthz(c *gin.Context) {
 	c.String(http.StatusOK, "OK")
 }
 
-// Calendar func
-func Calendar(c *gin.Context) {
+// Index func
+func Index(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", gin.H{"staticUrl": config.Config.Server.StaticURL})
 }
 
-// CalendarInit func
-func CalendarInit(c *gin.Context) {
+// Initial func
+func Initial(c *gin.Context) {
+	session := sessions.Default(c)
+	var user model.User
+	if userID := session.Get(sessionName); userID != nil {
+		user = model.GetUser(userID.(string))
+	}
+	fmt.Println(user)
+	c.JSON(http.StatusOK, gin.H{
+		"staticUrl":   config.Config.Server.StaticURL,
+		"emailDomain": model.EmailDomain,
+		"events":      model.GetEvents(),
+		"user":        user,
+	})
+}
+
+// SignIn func
+func SignIn(c *gin.Context) {
 	var params struct {
 		Email string `json:"email"`
 		Name  string `json:"name"`
@@ -30,21 +50,28 @@ func CalendarInit(c *gin.Context) {
 	if err := c.ShouldBindJSON(&params); err != nil {
 		handleError(c, err)
 	} else {
-		var user model.User
-		if params.Email != "" && strings.Contains(params.Email, model.EmailDomain) {
-			user = model.InitUser(params.Email, params.Name, params.Photo)
+		user, err := model.SignIn(params.Email, params.Name, params.Photo)
+		if err != nil {
+			handleError(c, err)
+		} else {
+			session := sessions.Default(c)
+			session.Set(sessionName, user.UserID)
+			session.Save()
+			c.JSON(http.StatusOK, gin.H{"user": user})
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"staticUrl":   config.Config.Server.StaticURL,
-			"emailDomain": model.EmailDomain,
-			"events":      model.GetEvents(),
-			"user":        user,
-		})
 	}
 }
 
-// CalendarAdd func
-func CalendarAdd(c *gin.Context) {
+// SignOut func
+func SignOut(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Clear()
+	session.Save()
+	c.JSON(http.StatusOK, gin.H{"user": model.User{}})
+}
+
+// AddEvent func
+func AddEvent(c *gin.Context) {
 	var params struct {
 		UserID string    `json:"userId"`
 		Date   time.Time `json:"date"`
@@ -61,8 +88,8 @@ func CalendarAdd(c *gin.Context) {
 	}
 }
 
-// CalendarDelete func
-func CalendarDelete(c *gin.Context) {
+// DeleteEvent func
+func DeleteEvent(c *gin.Context) {
 	var params struct {
 		EventID string `json:"id"`
 	}

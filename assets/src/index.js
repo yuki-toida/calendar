@@ -22,6 +22,9 @@ function createStore(data) {
       isSignIn: state => state.user.id,
     },
     mutations: {
+      setUser(state, payload) {
+        state.user = payload;
+      },
       addEvent(state, payload) {
         state.events.push(payload);
       },
@@ -43,18 +46,28 @@ firebase.initializeApp({
   messagingSenderId: '631172645333',
 });
 
-firebase.auth().onAuthStateChanged((user) => {
-  const googleUser = user || null;
-  const email = googleUser ? googleUser.email : null;
-  const name = googleUser ? googleUser.displayName : null;
-  const photo = googleUser ? googleUser.photoURL : null;
-  http.post('/init', { email, name, photo }).then((data) => {
-    new Vue({
-      el: '#app',
-      router,
-      components: { app },
-      render: h => h(app),
-      store: createStore(data),
-    });
+http.get('/initial').then((data) => {
+  new Vue({
+    el: '#app',
+    router,
+    components: { app },
+    render: h => h(app),
+    store: createStore(data),
   });
 });
+
+// firebase.auth().onAuthStateChanged((user) => {
+//   const googleUser = user || null;
+//   const email = googleUser ? googleUser.email : null;
+//   const name = googleUser ? googleUser.displayName : null;
+//   const photo = googleUser ? googleUser.photoURL : null;
+//   http.post('/init', { email, name, photo }).then((data) => {
+//     new Vue({
+//       el: '#app',
+//       router,
+//       components: { app },
+//       render: h => h(app),
+//       store: createStore(data),
+//     });
+//   });
+// });

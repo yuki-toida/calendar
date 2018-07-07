@@ -29,20 +29,29 @@
 
 <script>
 import firebase from 'firebase';
+import http from './http';
 
 export default {
   methods: {
     signIn: function() {
       var provider = new firebase.auth.GoogleAuthProvider();
       firebase.auth().signInWithPopup(provider).then((result) => {
-        window.location.reload();
+        http.post('/signin', {
+          email: result.user.email,
+          name: result.user.displayName,
+          photo: result.user.photoURL,
+        }).then((data) => {
+          this.$store.commit('setUser', data.user);
+        });
       }).catch((error) => {
         console.log(error);
       });
     },
     signOut: function() {
       firebase.auth().signOut().then(() => {
-        window.location.reload();
+        http.delete('/signout').then((data) => {
+          this.$store.commit('setUser', data.user);
+        });
       }).catch((error) => {
         console.log(error);
       });

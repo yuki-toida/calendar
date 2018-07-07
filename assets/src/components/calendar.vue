@@ -30,22 +30,22 @@ export default {
     },
     clickDate(date) {
       if (this.$store.getters.isSignIn) {
-        http.post('/', {userId: this.$store.state.user.id, date: date})
+        http.post('/events', {userId: this.$store.state.user.id, date: date})
         .then((data) => {
           this.$store.commit('addEvent', data.event);
         })
       } else {
-        console.log("please sign in");
+        console.log("サインインしてください");
       }
     },
     clickEvent(event) {
       if (this.$store.getters.isSignIn) {
-        http.put('/', {id: event.id, date: event.startDate})
+        http.put('/events', {id: event.id, date: event.startDate})
         .then((data) => {
           this.$store.commit('removeEvent', event);
         })
       } else {
-        console.log("please sign in");
+        console.log("サインインしてください");
       }
     },
   }

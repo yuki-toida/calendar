@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/yuki-toida/knowme/config"
 )
 
@@ -42,23 +41,31 @@ func Migrate() {
 	db.AutoMigrate(&User{}, &Event{})
 }
 
-// InitUser func
-func InitUser(email, name, photo string) User {
+// SignIn func
+func SignIn(email, name, photo string) (User, error) {
+	if email == "" || !strings.Contains(email, EmailDomain) {
+		return User{}, errors.New("Invalid email")
+	}
 	db := config.ConnectDB()
 	userID := strings.Replace(email, EmailDomain, "", -1)
-	user := GetUser(db, userID)
+	user := GetUser(userID)
 	if user == (User{}) {
 		user.UserID = userID
 		user.Email = email
 		user.Name = name
 		user.Photo = photo
 		db.Create(&user)
+	} else {
+		user.Name = name
+		user.Photo = photo
+		db.Save(&user)
 	}
-	return user
+	return user, nil
 }
 
 // GetUser func
-func GetUser(db *gorm.DB, userID string) User {
+func GetUser(userID string) User {
+	db := config.ConnectDB()
 	var user User
 	if userID != "" {
 		db.Where(&User{UserID: userID}).First(&user)
@@ -76,12 +83,12 @@ func GetEvents() []Event {
 
 // AddEvent func
 func AddEvent(userID string, date time.Time) (Event, error) {
-	db := config.ConnectDB()
-	user := GetUser(db, userID)
+	user := GetUser(userID)
 	if user == (User{}) {
 		return Event{}, errors.New("Invalid userID")
 	}
 	var event Event
+	db := config.ConnectDB()
 	db.Where(&Event{Year: date.Year(), Month: int(date.Month()), UserID: userID}).First(&event)
 	fmt.Println(event)
 	if event != (Event{}) {
