@@ -10,11 +10,11 @@
   <script>
     var link = document.createElement('link');
     link.setAttribute('rel', 'icon');
-    link.setAttribute('href', '{{ .staticUrl }}/static/favicon.ico');
+    link.setAttribute('href', '{{ .staticPath }}/favicon.ico');
     document.head.appendChild(link);
 
     var script = document.createElement('script');
-    script.setAttribute('src', '{{ .staticUrl }}/static/js/app.js');
+    script.setAttribute('src', '{{ .staticPath }}/js/app.js');
     document.head.appendChild(script);
   </script>
 </body>

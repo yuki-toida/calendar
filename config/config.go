@@ -8,13 +8,16 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// SessionName const
+const SessionName = "ID"
+
 // Config struct
 var Config struct {
 	Env    string
 	Server struct {
 		Host       string `toml:"host"`
 		Port       string `toml:"port"`
-		StaticURL  string `toml:"static-url"`
+		StaticPath string `toml:"static-path"`
 		BucketName string `toml:"bucket-name"`
 	}
 }
@@ -27,7 +30,7 @@ func Initialize() {
 		panic(err)
 	}
 	Config.Env = env
-	fmt.Printf("[config] : %v+\n", Config)
+	fmt.Printf("[CONFIG] : %+v\n", Config)
 }
 
 // ConnectDB func

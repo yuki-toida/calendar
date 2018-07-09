@@ -13,18 +13,15 @@ function createStore(data) {
   return new Vuex.Store({
     strict: false,
     state: {
-      staticUrl: data.staticUrl,
+      staticPath: data.staticPath,
       emailDomain: data.emailDomain,
       events: data.events,
       user: data.user,
     },
     getters: {
-      isSignIn: state => state.user.id,
+      isSignIn: state => state.user != null,
     },
     mutations: {
-      setUser(state, payload) {
-        state.user = payload;
-      },
       addEvent(state, payload) {
         state.events.push(payload);
       },
@@ -47,6 +44,7 @@ firebase.initializeApp({
 });
 
 http.get('/initial').then((data) => {
+  console.log(data);
   new Vue({
     el: '#app',
     router,

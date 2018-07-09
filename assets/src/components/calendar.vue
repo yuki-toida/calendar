@@ -1,23 +1,21 @@
 <template>
-  <div class="container">
-		<calendar
-      v-bind:events="$store.state.events"
-      v-bind:startingDayOfWeek="1"
-      v-bind:show-date="showDate"
-			v-on:show-date-change="showDateChange"
-      v-on:click-date="clickDate"
-      v-on:click-event="clickEvent"
-    />
-  </div>
+  <SimpleCalendar
+    v-bind:events="$store.state.events"
+    v-bind:startingDayOfWeek="1"
+    v-bind:show-date="showDate"
+    v-on:show-date-change="showDateChange"
+    v-on:click-date="clickDate"
+    v-on:click-event="clickEvent"
+  />
 </template>
 
 <script>
 import http from '../http';
-import Calendar from "vue-simple-calendar"
+import SimpleCalendar from "vue-simple-calendar"
 
 export default {
   components: {
-    Calendar
+    SimpleCalendar
   },
   data: function() {
     return {
@@ -30,7 +28,7 @@ export default {
     },
     clickDate(date) {
       if (this.$store.getters.isSignIn) {
-        http.post('/events', {userId: this.$store.state.user.id, date: date})
+        http.post('/events', {date: date})
         .then((data) => {
           this.$store.commit('addEvent', data.event);
         })
@@ -40,10 +38,12 @@ export default {
     },
     clickEvent(event) {
       if (this.$store.getters.isSignIn) {
-        http.put('/events', {id: event.id, date: event.startDate})
-        .then((data) => {
-          this.$store.commit('removeEvent', event);
-        })
+        if (event.id.includes(this.$store.state.user.id)) {
+          http.put('/events', {id: event.id, date: event.startDate})
+          .then((data) => {
+            this.$store.commit('removeEvent', event);
+          })
+        }
       } else {
         console.log("サインインしてください");
       }

@@ -1,5 +1,5 @@
 [server]
-host = "http://concat.theliveup.tv"
+host = "http://knowme.theliveup.tv"
 port = "8080"
-static-url = "https://storage.googleapis.com/bucket-concat-dev"
-bucket-name = "bucket-concat-dev"
+static-path = "https://storage.googleapis.com/bucket-knowme-dev"
+bucket-name = "bucket-knowme-dev"
