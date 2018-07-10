@@ -61,7 +61,7 @@ func HomeSignIn(c *gin.Context) {
 			session := sessions.Default(c)
 			session.Set(config.SessionName, user.ID)
 			session.Save()
-			c.JSON(http.StatusOK, gin.H{"user": *user})
+			c.JSON(http.StatusOK, gin.H{"user": user})
 		}
 	}
 }
@@ -71,5 +71,5 @@ func HomeSignOut(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Clear()
 	session.Save()
-	c.JSON(http.StatusOK, gin.H{"user": model.User{}})
+	c.JSON(http.StatusOK, gin.H{})
 }

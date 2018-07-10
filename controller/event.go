@@ -5,14 +5,14 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-
 	"github.com/yuki-toida/knowme/model"
 )
 
 // EventAdd func
 func EventAdd(c *gin.Context) {
 	var params struct {
-		Date time.Time `json:"date"`
+		Category string    `json:"category"`
+		Date     time.Time `json:"date"`
 	}
 	if err := c.ShouldBindJSON(&params); err != nil {
 		handleError(c, err)
@@ -21,11 +21,11 @@ func EventAdd(c *gin.Context) {
 		if err != nil {
 			handleError(c, err)
 		}
-		event, err := model.AddEvent(user, params.Date.In(time.Local))
+		event, err := model.AddEvent(user, params.Category, params.Date.In(time.Local))
 		if err != nil {
 			handleError(c, err)
 		} else {
-			c.JSON(http.StatusOK, gin.H{"event": *event})
+			c.JSON(http.StatusOK, gin.H{"event": event})
 		}
 	}
 }
@@ -33,7 +33,8 @@ func EventAdd(c *gin.Context) {
 // EventDelete func
 func EventDelete(c *gin.Context) {
 	var params struct {
-		EventID string `json:"id"`
+		Category string    `json:"category"`
+		Date     time.Time `json:"date"`
 	}
 	if err := c.ShouldBindJSON(&params); err != nil {
 		handleError(c, err)
@@ -42,10 +43,11 @@ func EventDelete(c *gin.Context) {
 		if err != nil {
 			handleError(c, err)
 		}
-		if err := model.DeleteEvent(user, params.EventID); err != nil {
+		event, err := model.DeleteEvent(user, params.Category, params.Date.In(time.Local))
+		if err != nil {
 			handleError(c, err)
 		} else {
-			c.JSON(http.StatusOK, gin.H{"ok": true})
+			c.JSON(http.StatusOK, gin.H{"event": event})
 		}
 	}
 }

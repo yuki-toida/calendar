@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import calendar from './components/calendar.vue';
-import user from './components/user.vue';
+import Calendar from './components/Calendar.vue';
+import User from './components/User.vue';
 
 Vue.use(Router);
 
@@ -10,12 +10,12 @@ export default new Router({
     {
       path: '/',
       name: 'Calendar',
-      component: calendar,
+      component: Calendar,
     },
     {
-      path: '/user',
+      path: '/users/:id',
       name: 'User',
-      component: user,
+      component: User,
     },
   ],
 });

@@ -48,11 +48,14 @@ func main() {
 	router.GET("/initial", controller.HomeInitial)
 	router.POST("/signin", controller.HomeSignIn)
 	router.DELETE("/signout", controller.HomeSignOut)
-
-	event := router.Group("/events")
+	events := router.Group("/events")
 	{
-		event.POST("/", controller.EventAdd)
-		event.PUT("/", controller.EventDelete)
+		events.POST("/", controller.EventAdd)
+		events.PUT("/", controller.EventDelete)
+	}
+	users := router.Group("/users")
+	{
+		users.GET("/:id", controller.User)
 	}
 
 	router.Run(":" + config.Config.Server.Port)

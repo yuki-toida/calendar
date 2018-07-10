@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-function handle(res, resolve) {
+function handle(res, resolve, reject) {
   if (res.data) {
     if (res.data.error) {
-      console.log(res.data.error);
+      reject(res.data.error);
     } else {
       resolve(res.data);
     }
@@ -20,33 +20,33 @@ class Http {
   }
 
   get(path) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       axios.get(`${this.domain}${path}`)
-        .then(res => handle(res, resolve))
+        .then(res => handle(res, resolve, reject))
         .catch(error => console.log(error));
     });
   }
 
   delete(path) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       axios.delete(`${this.domain}${path}`)
-        .then(res => handle(res, resolve))
+        .then(res => handle(res, resolve, reject))
         .catch(error => console.log(error));
     });
   }
 
   post(path, data) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       axios.post(`${this.domain}${path}`, data)
-        .then(res => handle(res, resolve))
+        .then(res => handle(res, resolve, reject))
         .catch(error => console.log(error));
     });
   }
 
   put(path, data) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       axios.put(`${this.domain}${path}`, data)
-        .then(res => handle(res, resolve))
+        .then(res => handle(res, resolve, reject))
         .catch(error => console.log(error));
     });
   }

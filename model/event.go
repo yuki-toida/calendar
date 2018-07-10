@@ -2,21 +2,24 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/jinzhu/gorm"
-
 	"github.com/yuki-toida/knowme/config"
 )
 
-// EmailDomain const
-const myEventClass = "text-white bg-primary rounded"
-const otherEventClass = "rounded"
+const eventCapacity = 3
+const myDayClass = "text-white bg-danger rounded"
+const dayClass = "text-white bg-danger rounded"
+const myNightClass = "text-white bg-primary rounded"
+const nightClass = "text-white bg-primary rounded"
 
 // Event struct
 type Event struct {
 	Year      int       `gorm:"primary_key;type:int" json:"-"`
 	Month     int       `gorm:"primary_key;type:int" json:"-"`
+	Category  string    `gorm:"primary_key" json:"-"`
 	ID        string    `gorm:"primary_key" json:"-"`
 	EventID   string    `gorm:"unique;not null" json:"id"`
 	Title     string    `gorm:"not null" json:"title"`
@@ -27,59 +30,96 @@ type Event struct {
 	UpdatedAt time.Time `json:"-"`
 }
 
+func isDay(category string) bool {
+	return category == "day"
+}
+
 // GetEvents func
 func GetEvents(user *User) []Event {
 	db := config.ConnectDB()
-	var events []Event
-	db.Find(&events)
+	events := GetAllEvents(db)
 	for i := range events {
 		event := &events[i]
 		if user != nil && event.ID == user.ID {
-			event.Classes = myEventClass
+			if isDay(event.Category) {
+				event.Classes = myDayClass
+			} else {
+				event.Classes = myNightClass
+			}
 		} else {
-			event.Classes = otherEventClass
+			if isDay(event.Category) {
+				event.Classes = dayClass
+			} else {
+				event.Classes = nightClass
+			}
 		}
 	}
 	return events
 }
 
+// GetAllEvents func
+func GetAllEvents(db *gorm.DB) []Event {
+	var events []Event
+	db.Find(&events)
+	return events
+}
+
 // AddEvent func
-func AddEvent(user *User, date time.Time) (*Event, error) {
+func AddEvent(user *User, category string, date time.Time) (*Event, error) {
 	db := config.ConnectDB()
-	if anyEvent(db, date.Year(), int(date.Month()), user.ID) {
-		return nil, errors.New("既にイベントに参加しています")
+	year := date.Year()
+	month := int(date.Month())
+	if getEvent(db, year, month, category, user.ID) != nil {
+		return nil, errors.New("既に参加しています")
+	}
+	if !verifyEventCapacity(db, year, month, category, date) {
+		return nil, fmt.Errorf("定員（%d人）オーバーです", eventCapacity)
+	}
+	var classes string
+	if isDay(category) {
+		classes = myDayClass
+	} else {
+		classes = myNightClass
 	}
 	event := &Event{
 		Year:      date.Year(),
 		Month:     int(date.Month()),
+		Category:  category,
 		ID:        user.ID,
-		EventID:   format(date) + ":" + user.ID,
+		EventID:   format(date) + ":" + category + ":" + user.ID,
 		Title:     user.Name,
 		StartDate: date,
 		EndDate:   date,
-		Classes:   myEventClass,
+		Classes:   classes,
 	}
 	db.Create(event)
 	return event, nil
 }
 
-func anyEvent(db *gorm.DB, year, month int, id string) bool {
+func getEvent(db *gorm.DB, year, month int, category, id string) *Event {
 	var event Event
-	db.Where(&Event{Year: year, Month: month, ID: id}).First(&event)
-	return event != (Event{})
+	db.Where(&Event{Year: year, Month: month, Category: category, ID: id}).First(&event)
+	if event == (Event{}) {
+		return nil
+	}
+	return &event
+}
+
+func verifyEventCapacity(db *gorm.DB, year, month int, category string, date time.Time) bool {
+	var count int
+	db.Model(&Event{}).Where(&Event{Year: year, Month: month, Category: category, StartDate: date}).Count(&count)
+	return count < eventCapacity
 }
 
 // DeleteEvent func
-func DeleteEvent(user *User, eventID string) error {
+func DeleteEvent(user *User, category string, date time.Time) (*Event, error) {
 	db := config.ConnectDB()
-	var event Event
-	db.Where(&Event{EventID: eventID}).First(&event)
-	if event == (Event{}) {
-		return errors.New("削除するイベントが存在していません")
+	year := date.Year()
+	month := int(date.Month())
+	event := getEvent(db, year, month, category, user.ID)
+	if event == nil {
+		return nil, errors.New("参加していません")
 	}
-	if event.ID != user.ID {
-		return errors.New("自分のイベントではありません")
-	}
-	db.Delete(&event)
-	return nil
+	db.Delete(event)
+	return event, nil
 }

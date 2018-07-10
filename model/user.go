@@ -32,6 +32,13 @@ type User struct {
 	UpdatedAt time.Time `json:"-"`
 }
 
+// UserEvent struct
+type UserEvent struct {
+	Date     string   `json:"date"`
+	Category string   `json:"category"`
+	Names    []string `json:"names"`
+}
+
 // SignIn func
 func SignIn(id, name, photo string) (*User, error) {
 	if id == "" || !strings.Contains(id, EmailDomain) {
@@ -49,6 +56,17 @@ func SignIn(id, name, photo string) (*User, error) {
 		db.Save(user)
 	}
 	return user, nil
+}
+
+// GetUserEvents func
+func GetUserEvents(id string) (*User, []UserEvent) {
+	db := config.ConnectDB()
+	// allEvents := GetAllEvents(db)
+	events := []UserEvent{
+		{Date: format(time.Now()), Category: "day", Names: []string{"戸井田裕貴", "大高俊輝", "髙木清代"}},
+		{Date: format(time.Now()), Category: "night", Names: []string{"戸井田裕貴", "大高俊輝", "髙木清代"}},
+	}
+	return GetUser(db, id), events
 }
 
 // GetUser func

@@ -2,12 +2,20 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import Vue from 'vue';
 import Vuex from 'vuex';
+import Toasted from 'vue-toasted';
 import firebase from 'firebase';
 import router from './router';
-import app from './app.vue';
+import App from './App.vue';
 import http from './http';
 
 Vue.use(Vuex);
+Vue.use(Toasted, {
+  theme: 'outline',
+  position: 'top-center',
+  duration: 4000,
+  type: 'error',
+  singleton: true,
+});
 
 function createStore(data) {
   return new Vuex.Store({
@@ -48,24 +56,15 @@ http.get('/initial').then((data) => {
   new Vue({
     el: '#app',
     router,
-    components: { app },
-    render: h => h(app),
+    components: { App },
+    render: h => h(App),
     store: createStore(data),
   });
-});
+}).catch(error => this.$toasted.show(error));
 
 // firebase.auth().onAuthStateChanged((user) => {
 //   const googleUser = user || null;
 //   const email = googleUser ? googleUser.email : null;
 //   const name = googleUser ? googleUser.displayName : null;
 //   const photo = googleUser ? googleUser.photoURL : null;
-//   http.post('/init', { email, name, photo }).then((data) => {
-//     new Vue({
-//       el: '#app',
-//       router,
-//       components: { app },
-//       render: h => h(app),
-//       store: createStore(data),
-//     });
-//   });
 // });

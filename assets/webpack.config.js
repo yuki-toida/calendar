@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 
@@ -55,6 +56,10 @@ module.exports = (_, argv) => ({
     new VueLoaderPlugin(),
     new CopyWebpackPlugin([
       { from: 'static', to: path.resolve(__dirname, '../static') }
-    ])
+    ]),
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery'
+    }),    
   ],
 });
