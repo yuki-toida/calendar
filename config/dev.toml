@@ -1,5 +1,8 @@
 [server]
-host = "http://knowme.theliveup.tv"
+host = "https://knowme.theliveup.tv"
 port = "8080"
-static-path = "https://storage.googleapis.com/bucket-knowme-dev"
-bucket-name = "bucket-knowme-dev"
+
+[db]
+host = "127.0.0.1"
+port = "3306"
+name = "knowme_dev"

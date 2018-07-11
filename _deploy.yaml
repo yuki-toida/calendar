@@ -1,0 +1,71 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: knowme-deploy-dev
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: knowme-dev
+    spec:
+      containers:
+      - name: knowme-dev
+        image: asia.gcr.io/planet-pluto-dev/knowme-dev:latest
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 120
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 120
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: DB_HOST
+          value: "127.0.0.1"
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: password
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+        command: 
+        - "/cloud_sql_proxy"
+        - "--dir=/cloudsql"
+        - "-instances=planet-pluto-dev:asia-northeast1:mysql-dev=tcp:3306"
+        - "-credential_file=/secrets/cloudsql/credentials.json"
+        volumeMounts:
+        - name: cloudsql-instance-credentials
+          mountPath: /secrets/cloudsql
+          readOnly: true
+        - name: ssl-certs
+          mountPath: /etc/ssl/certs
+        - name: cloudsql
+          mountPath: /cloudsql
+      volumes:
+      - name: cloudsql-instance-credentials
+        secret:
+          secretName: cloudsql-instance-credentials
+      - name: ssl-certs
+        hostPath:
+          path: /etc/ssl/certs
+      - name: cloudsql
+        emptyDir:

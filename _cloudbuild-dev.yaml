@@ -3,6 +3,6 @@ steps:
   args:
   - 'build'
   - '--file=Dockerfile'
-  - '--tag=asia.gcr.io/$PROJECT_ID/concat-dev'
+  - '--tag=asia.gcr.io/$PROJECT_ID/knowme-dev'
   - '.'
-images: ['asia.gcr.io/$PROJECT_ID/concat-dev']
+images: ['asia.gcr.io/$PROJECT_ID/knowme-dev']

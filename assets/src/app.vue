@@ -2,24 +2,21 @@
   <div class="container">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <router-link class="navbar-brand" v-bind:to="{ name: 'Calendar' }">
-        <img v-bind:src="$store.state.staticPath + '/img/logo.jpg'" width="30" height="auto" class="d-inline-block align-top" alt="">
-        Knowmeカレンダー
+        <img v-bind:src="'/static/img/logo.jpg'" width="30" height="auto" class="d-inline-block align-top" alt="">
+        Knowmeカレンダー<span class="text-muted">（β版)</span>
       </router-link>
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <router-link class="nav-link" v-bind:to="{ name: 'User', params: { id: $store.state.user.id } }">
-            検索
+          <router-link class="nav-link" v-if="$store.getters.isSignIn" v-bind:to="{ name: 'User', params: { id: $store.state.user.id } }">
+            履歴
           </router-link>
         </li>
       </ul>
       <ul class="navbar-nav">
         <li v-if="$store.getters.isSignIn" class="nav-item">
           {{ $store.state.user.id }}
-          <!--
-          <button class="btn btn-danger" v-on:click="signOut">サインアウト</button>
-          -->
         <li v-else class="nav-item">
-          <button class="btn btn-primary" v-on:click="signIn">
+          <button class="btn btn-outline-success" v-on:click="signIn">
             {{ $store.state.emailDomain }} でサインイン
           </button>
         </li>

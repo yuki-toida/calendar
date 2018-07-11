@@ -3,6 +3,7 @@ package controller
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -30,17 +31,20 @@ func HomeHealthz(c *gin.Context) {
 
 // HomeIndex func
 func HomeIndex(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.html", gin.H{"staticPath": config.Config.Server.StaticPath})
+	c.HTML(http.StatusOK, "index.html", gin.H{})
 }
 
 // HomeInitial func
 func HomeInitial(c *gin.Context) {
 	user, _ := getUser(c)
+	dayRest, nightRest := model.GetEventRest(time.Now())
 	c.JSON(http.StatusOK, gin.H{
-		"staticPath":  config.Config.Server.StaticPath,
-		"emailDomain": model.EmailDomain,
-		"events":      model.GetEvents(user),
-		"user":        user,
+		"emailDomain":    model.EmailDomain,
+		"events":         model.GetEvents(user),
+		"user":           user,
+		"myEvent":        model.GetUserEvent(user),
+		"dayEventRest":   dayRest,
+		"nightEventRest": nightRest,
 	})
 }
 

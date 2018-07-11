@@ -8,13 +8,9 @@ fi
 # node process kill
 killall node
 
-dep ensure
-
-# docker build -t hoge:latest .
-
 ENV=$1
 REGISTRY=asia.gcr.io/planet-pluto-$ENV
-IMAGE=concat-$ENV
+IMAGE=knowme-$ENV
 
 # latest -> stable
 latest=`gcloud container images list-tags $REGISTRY/$IMAGE --filter='tags:latest'`

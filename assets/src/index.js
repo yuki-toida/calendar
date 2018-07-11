@@ -21,10 +21,12 @@ function createStore(data) {
   return new Vuex.Store({
     strict: false,
     state: {
-      staticPath: data.staticPath,
       emailDomain: data.emailDomain,
       events: data.events,
       user: data.user,
+      myEvent: data.myEvent,
+      dayEventRest: data.dayEventRest,
+      nightEventRest: data.nightEventRest,
     },
     getters: {
       isSignIn: state => state.user != null,

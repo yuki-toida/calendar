@@ -15,10 +15,13 @@ const SessionName = "ID"
 var Config struct {
 	Env    string
 	Server struct {
-		Host       string `toml:"host"`
-		Port       string `toml:"port"`
-		StaticPath string `toml:"static-path"`
-		BucketName string `toml:"bucket-name"`
+		Host string `toml:"host"`
+		Port string `toml:"port"`
+	}
+	Db struct {
+		Host string `toml:"host"`
+		Port string `toml:"port"`
+		Name string `toml:"name"`
 	}
 }
 
@@ -35,7 +38,8 @@ func Initialize() {
 
 // ConnectDB func
 func ConnectDB() *gorm.DB {
-	db, err := gorm.Open("mysql", "root:zaqroot@tcp(127.0.0.1:7306)/knowme?charset=utf8&parseTime=True&loc=Local")
+	connectionString := "root:zaqroot@tcp(" + Config.Db.Host + ":" + Config.Db.Port + ")/" + Config.Db.Name + "?charset=utf8&parseTime=True&loc=Local"
+	db, err := gorm.Open("mysql", connectionString)
 	if err != nil {
 		panic(err.Error())
 	}

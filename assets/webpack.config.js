@@ -9,7 +9,7 @@ module.exports = (_, argv) => ({
     filename: 'app.js',
     path: argv.mode == 'development'
       ? path.resolve(__dirname, '../static/js')
-      : path.resolve(__dirname, './_build')
+      : path.resolve(__dirname, '../static/js')
   },
   devtool: 'source-map',
   module: {

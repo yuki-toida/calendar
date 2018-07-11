@@ -16,7 +16,7 @@ class Http {
   constructor() {
     this.domain = process.env.NODE_ENV === 'development'
       ? 'http://localhost:8080'
-      : 'http://knowme.theliveup.tv';
+      : 'https://knowme.theliveup.tv';
   }
 
   get(path) {

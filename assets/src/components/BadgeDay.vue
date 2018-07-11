@@ -1,5 +1,5 @@
 <template>
-  <span class="badge badge-pill badge-danger ml-2">{{ value }}</span>
+  <span class="badge badge-pill badge-danger">{{ value }}</span>
 </template>
 
 <script>

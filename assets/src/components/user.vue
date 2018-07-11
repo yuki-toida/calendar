@@ -1,7 +1,7 @@
 <template>
   <div>
     <p v-if="user" class="h5 my-3">
-      <!-- <img v-bind:src="user.photo" class="rounded" width="auto" height="50"> -->
+      <img v-bind:src="user.photo" class="rounded" width="auto" height="50">
       {{ user.name }}
       {{ user.id }}
     </p>
@@ -12,12 +12,14 @@
       <tbody>
         <tr v-for="(event, index) in events" v-bind:key="index">
           <th scope="row">
-            {{ event.date }}
+            {{ format(event.date) }}
+          </th>
+          <td>
             <badge-day v-if="event.category == 'day'"/>
             <badge-night v-else/>
-          </th>
-          <td v-for="name in event.names" v-bind:key="name">
-            {{ name }}
+          </td>
+          <td v-for="title in event.titles" v-bind:key="title">
+            {{ title }}
           </td>
         </tr>
       </tbody>
@@ -54,6 +56,12 @@ export default {
       })
   },
   methods: {
+    format(date) {
+      if (typeof(date) == 'string') {
+        date = new Date(date);
+      }
+      return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+    },
   }
 }
 </script>

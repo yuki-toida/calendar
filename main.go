@@ -28,7 +28,8 @@ func sessionMiddleware() gin.HandlerFunc {
 
 func init() {
 	config.Initialize()
-	model.Migrate()
+	db := config.ConnectDB()
+	db.AutoMigrate(&model.User{}, &model.Event{})
 }
 
 func main() {
@@ -38,10 +39,8 @@ func main() {
 	router.Use(sessions.Sessions("_knowme", store))
 	router.Use(sessionMiddleware())
 
+	router.StaticFS("/static", http.Dir("static"))
 	router.LoadHTMLFiles("index.html")
-	if config.Config.Env == "local" {
-		router.StaticFS("/static", http.Dir("static"))
-	}
 
 	router.GET("/healthz", controller.HomeHealthz)
 	router.GET("/", controller.HomeIndex)

@@ -4,18 +4,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Knowme</title>
+  <link rel="icon" href="/static/favicon.ico">
 </head>
 <body>
   <div id="app"></div>
-  <script>
-    var link = document.createElement('link');
-    link.setAttribute('rel', 'icon');
-    link.setAttribute('href', '{{ .staticPath }}/favicon.ico');
-    document.head.appendChild(link);
-
-    var script = document.createElement('script');
-    script.setAttribute('src', '{{ .staticPath }}/js/app.js');
-    document.head.appendChild(script);
-  </script>
+  <script type="text/javascript" src="/static/js/app.js"></script>
 </body>
 </html>

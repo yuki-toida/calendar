@@ -1,9 +1,32 @@
 <template>
   <div>
-    <p class="h5 my-3">
-      <badge-day/>
-      <badge-night/>
-    </p>
+    <div class="row my-3">
+      <div class="col-sm-6">
+        <p>
+          <badge-day/><span class="ml-3">{{ thisMonth }} 残席 {{ $store.state.dayEventRest }}</span>
+        </p>
+        <p>
+          <badge-night/><span class="ml-3">{{ thisMonth }} 残席 {{ $store.state.nightEventRest }}</span>
+        </p>
+      </div>
+      <div class="col-sm-6">
+        <div v-if="$store.state.myEvent" class="card">
+          <div class="card-body">
+            <p class="card-text">
+              {{ myEventDate }}
+              <badge-day v-if="$store.state.myEvent.category == 'day'" v-bind:text="'昼'"/>
+              <badge-night v-else v-bind:text="'夜'"/>
+            </p>
+            <ul class="list-inline">
+              <li v-for="title in $store.state.myEvent.titles" v-bind:key="title" class="list-inline-item">
+                {{ title }}
+              </li>
+            </ul>
+            <button type="button" class="btn btn-outline-dark btn-sm" v-on:click="leave">参加を取り消す</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <simple-calendar
       v-bind:events="$store.state.events"
       v-bind:startingDayOfWeek="1"
@@ -12,44 +35,16 @@
       v-on:click-date="clickDate"
       v-on:click-event="clickEvent"
     />
-    <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalLabel">{{ modalTitle }}</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="form-check form-check-inline">
-              <label class="form-check-label">
-                <input class="form-check-input" type="radio" name="inlineRadioOptions" value="day" v-model="modalCategory">
-                <badge-day/>
-              </label>
-            </div>
-            <div class="form-check form-check-inline">
-              <label class="form-check-label">
-                <input class="form-check-input" type="radio" name="inlineRadioOptions" value="night" v-model="modalCategory">
-                <badge-night/>
-              </label>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-dark" v-bind:class="{ disabled: modalCategory == null }" v-on:click="leave">辞退する</button>
-            <button type="button" class="btn btn-outline-dark" v-bind:class="{ disabled: modalCategory == null }" v-on:click="join">参加する</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <modal v-if="showModal" v-bind:date="targetDate" v-on:hide="showModal = false"/>
   </div>
 </template>
 
 <script>
-import http from '../http';
+import SimpleCalendar from "vue-simple-calendar"
+import Modal from './Modal.vue'
 import BadgeDay from './BadgeDay.vue'
 import BadgeNight from './BadgeNight.vue'
-import SimpleCalendar from "vue-simple-calendar"
+import http from '../http';
 
 export default {
   name: 'Calendar',
@@ -57,57 +52,42 @@ export default {
     'simple-calendar': SimpleCalendar,
     'badge-day': BadgeDay,
     'badge-night': BadgeNight,
+    'modal': Modal,
   },
   data: function() {
     return {
+      now: new Date(),
       showDate: new Date(),
-      modalTitle: null,
-      modalDate: null,
-      modalCategory: null,
+      showModal: false,
+      targetDate: null,
+    }
+  },
+  computed: {
+    thisMonth: function() {
+      return `${this.now.getFullYear()}年${this.now.getMonth() + 1}月`;
+    },
+    myEventDate: function() {
+      const date = new Date(this.$store.state.myEvent.date);
+      return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
     }
   },
   methods: {
     showDateChange(date) {
       this.showDate = date;
     },
-    showModal() {
-      $('#modal').modal('show');
-    },
-    hideModal() {
-      $('#modal').modal('hide');
-      this.modalTitle = null;
-      this.modalDate = null;
-      this.modalCategory = null;
-    },
     leave() {
-      if (this.modalCategory == null) return;
-      http.put('/events', {category: this.modalCategory, date: this.modalDate})
+      http.put('/events', {date: this.$store.state.myEvent.date, category: this.$store.state.myEvent.category})
         .then((data) => {
-          this.hideModal();
-          this.$store.commit('removeEvent', data.event);
+          window.location.reload();
         })
         .catch((error) => {
-          this.hideModal();
-          this.$toasted.show(error);
-        });
-    },
-    join() {
-      if (this.modalCategory == null) return;
-      http.post('/events', {category: this.modalCategory, date: this.modalDate})
-        .then((data) => {
-          this.hideModal();
-          this.$store.commit('addEvent', data.event);
-        })
-        .catch((error) => {
-          this.hideModal();
           this.$toasted.show(error);
         });
     },
     clickDate(date) {
       if (this.$store.getters.isSignIn) {
-        this.modalTitle = date.getFullYear() + "年" + (date.getMonth() + 1) + "月"+ date.getDate() + "日";
-        this.modalDate = date;
-        this.showModal();
+        this.targetDate = date;
+        this.showModal = true;
       } else {
         this.$toasted.show("サインインしてください");
       }

@@ -6,18 +6,11 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
-
 	"github.com/yuki-toida/knowme/config"
 )
 
 // EmailDomain const
 const EmailDomain = "@candee.co.jp"
-
-// Migrate func
-func Migrate() {
-	db := config.ConnectDB()
-	db.AutoMigrate(&User{}, &Event{})
-}
 
 func format(date time.Time) string {
 	return date.Format("2006-01-02")
@@ -34,9 +27,9 @@ type User struct {
 
 // UserEvent struct
 type UserEvent struct {
-	Date     string   `json:"date"`
-	Category string   `json:"category"`
-	Names    []string `json:"names"`
+	Date     time.Time `json:"date"`
+	Category string    `json:"category"`
+	Titles   []string  `json:"titles"`
 }
 
 // SignIn func
@@ -58,15 +51,56 @@ func SignIn(id, name, photo string) (*User, error) {
 	return user, nil
 }
 
+// GetUserEvent func
+func GetUserEvent(user *User) *UserEvent {
+	if user == nil {
+		return nil
+	}
+	db := config.ConnectDB()
+	now := time.Now()
+	myEvent := getEvent(db, now.Year(), int(now.Month()), user.ID)
+	if myEvent == nil {
+		return nil
+	}
+	var events []Event
+	db.Where(&Event{StartDate: myEvent.StartDate, Category: myEvent.Category}).Find(&events)
+	return &UserEvent{
+		Date:     myEvent.StartDate,
+		Category: myEvent.Category,
+		Titles:   getTitles(db, events, myEvent.StartDate, myEvent.Category),
+	}
+}
+
 // GetUserEvents func
 func GetUserEvents(id string) (*User, []UserEvent) {
 	db := config.ConnectDB()
-	// allEvents := GetAllEvents(db)
-	events := []UserEvent{
-		{Date: format(time.Now()), Category: "day", Names: []string{"戸井田裕貴", "大高俊輝", "髙木清代"}},
-		{Date: format(time.Now()), Category: "night", Names: []string{"戸井田裕貴", "大高俊輝", "髙木清代"}},
+	allEvents := GetAllEvents(db)
+	myEvents := []Event{}
+	for _, v := range allEvents {
+		if v.ID == id {
+			myEvents = append(myEvents, v)
+		}
+	}
+	events := []UserEvent{}
+	for _, v := range myEvents {
+		userEvent := UserEvent{
+			Date:     v.StartDate,
+			Category: v.Category,
+			Titles:   getTitles(db, allEvents, v.StartDate, v.Category),
+		}
+		events = append(events, userEvent)
 	}
 	return GetUser(db, id), events
+}
+
+func getTitles(db *gorm.DB, events []Event, date time.Time, category string) []string {
+	titles := []string{}
+	for _, v := range events {
+		if v.StartDate == date && v.Category == category {
+			titles = append(titles, v.Title)
+		}
+	}
+	return titles
 }
 
 // GetUser func
