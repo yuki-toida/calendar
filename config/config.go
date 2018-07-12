@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
-	"github.com/jinzhu/gorm"
 )
 
 // SessionName const
@@ -34,15 +33,4 @@ func Initialize() {
 	}
 	Config.Env = env
 	fmt.Printf("[CONFIG] : %+v\n", Config)
-}
-
-// ConnectDB func
-func ConnectDB() *gorm.DB {
-	connectionString := "root:zaqroot@tcp(" + Config.Db.Host + ":" + Config.Db.Port + ")/" + Config.Db.Name + "?charset=utf8&parseTime=True&loc=Local"
-	db, err := gorm.Open("mysql", connectionString)
-	if err != nil {
-		panic(err.Error())
-	}
-	db.LogMode(true)
-	return db
 }

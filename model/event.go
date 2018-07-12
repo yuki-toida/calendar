@@ -3,10 +3,8 @@ package model
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
-
-	"github.com/jinzhu/gorm"
-	"github.com/yuki-toida/knowme/config"
 )
 
 const eventCapacity = 3
@@ -40,8 +38,7 @@ func isDay(category string) bool {
 
 // GetEvents func
 func GetEvents(user *User) []Event {
-	db := config.ConnectDB()
-	events := GetAllEvents(db)
+	events := GetAllEvents()
 	for i := range events {
 		event := &events[i]
 		if user != nil && event.ID == user.ID {
@@ -63,36 +60,38 @@ func GetEvents(user *User) []Event {
 
 // GetEventRest func
 func GetEventRest(date time.Time) (int, int) {
-	db := config.ConnectDB()
 	year := date.Year()
 	month := int(date.Month())
-	dayCount := count(db, year, month, dayCategory)
-	nightCount := count(db, year, month, nightCategory)
+	dayCount := count(year, month, dayCategory)
+	nightCount := count(year, month, nightCategory)
 	dayRest := dayCouples*eventCapacity - dayCount
 	nightRest := nightCouples*eventCapacity - nightCount
 	return dayRest, nightRest
 }
 
 // GetAllEvents func
-func GetAllEvents(db *gorm.DB) []Event {
+func GetAllEvents() []Event {
 	var events []Event
-	db.Find(&events)
+	DB.Find(&events)
 	return events
 }
 
 // AddEvent func
 func AddEvent(user *User, category string, date time.Time) (*Event, error) {
-	db := config.ConnectDB()
 	year := date.Year()
 	month := int(date.Month())
-	if getEvent(db, year, month, user.ID) != nil {
+	if getEvent(year, month, user.ID) != nil {
 		return nil, errors.New("今月は既に参加済みです")
 	}
-	if !verifyEventCapacity(db, year, month, date, category) {
+	if !verifyEventCapacity(year, month, date, category) {
 		return nil, fmt.Errorf("定員（%d人）オーバーです", eventCapacity)
 	}
-	if !verifyCategoryCapacity(db, year, month, category) {
+	if !verifyCategoryCapacity(year, month, category) {
 		return nil, errors.New("残席オーバーです")
+	}
+	if sameIDs := verifySameID(year, month, date, category, user.ID); 0 < len(sameIDs) {
+		message := strings.Join(sameIDs, " ")
+		return nil, errors.New(message + "と既に参加済みです")
 	}
 	var classes string
 	if isDay(category) {
@@ -111,48 +110,89 @@ func AddEvent(user *User, category string, date time.Time) (*Event, error) {
 		Category:  category,
 		Classes:   classes,
 	}
-	db.Create(event)
+	DB.Create(event)
 	return event, nil
 }
 
 // DeleteEvent func
 func DeleteEvent(user *User, category string, date time.Time) (*Event, error) {
-	db := config.ConnectDB()
 	year := date.Year()
 	month := int(date.Month())
-	event := getEvent(db, year, month, user.ID)
+	event := getEvent(year, month, user.ID)
 	if event == nil {
 		return nil, errors.New("参加していません")
 	}
-	db.Delete(event)
+	DB.Delete(event)
 	return event, nil
 }
 
-func getEvent(db *gorm.DB, year, month int, id string) *Event {
+func getEvent(year, month int, id string) *Event {
 	var event Event
-	db.Where(&Event{Year: year, Month: month, ID: id}).First(&event)
+	DB.Where(&Event{Year: year, Month: month, ID: id}).First(&event)
 	if event == (Event{}) {
 		return nil
 	}
 	return &event
 }
 
-func verifyEventCapacity(db *gorm.DB, year, month int, date time.Time, category string) bool {
+func getEventTitles(events []Event, date time.Time, category string) []string {
+	titles := []string{}
+	for _, v := range events {
+		if v.StartDate == date && v.Category == category {
+			titles = append(titles, v.Title)
+		}
+	}
+	return titles
+}
+
+func verifyEventCapacity(year, month int, date time.Time, category string) bool {
 	var count int
-	db.Model(&Event{}).Where(&Event{Year: year, Month: month, StartDate: date, Category: category}).Count(&count)
+	DB.Model(&Event{}).Where(&Event{Year: year, Month: month, StartDate: date, Category: category}).Count(&count)
 	return count < eventCapacity
 }
 
-func verifyCategoryCapacity(db *gorm.DB, year, month int, category string) bool {
-	count := count(db, year, month, category)
+func verifyCategoryCapacity(year, month int, category string) bool {
+	count := count(year, month, category)
 	if isDay(category) {
 		return count < dayCouples*eventCapacity
 	}
 	return count < nightCouples*eventCapacity
 }
 
-func count(db *gorm.DB, year, month int, category string) int {
+func verifySameID(year, month int, date time.Time, category, id string) []string {
+	var yearEvents []Event
+	DB.Where(&Event{Year: year}).Find(&yearEvents)
+	myEvents := []Event{}
+	for _, v := range yearEvents {
+		if v.ID == id {
+			myEvents = append(myEvents, v)
+		}
+	}
+	ids := []string{}
+	for _, x := range yearEvents {
+		for _, y := range myEvents {
+			if x.StartDate == y.StartDate && x.Category == y.Category {
+				if x.ID != y.ID {
+					ids = append(ids, x.ID)
+				}
+			}
+		}
+	}
+	sameIDs := []string{}
+	for _, x := range yearEvents {
+		if x.StartDate == date && x.Category == category {
+			for _, y := range ids {
+				if x.ID == y {
+					sameIDs = append(sameIDs, x.ID)
+				}
+			}
+		}
+	}
+	return sameIDs
+}
+
+func count(year, month int, category string) int {
 	var count int
-	db.Model(&Event{}).Where(&Event{Year: year, Month: month, Category: category}).Count(&count)
+	DB.Model(&Event{}).Where(&Event{Year: year, Month: month, Category: category}).Count(&count)
 	return count
 }

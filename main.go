@@ -18,8 +18,7 @@ func sessionMiddleware() gin.HandlerFunc {
 		if !strings.HasPrefix(c.Request.URL.Path, "/static") {
 			session := sessions.Default(c)
 			if id := session.Get(config.SessionName); id != nil {
-				db := config.ConnectDB()
-				user := model.GetUser(db, id.(string))
+				user := model.GetUser(id.(string))
 				c.Set(config.SessionName, user)
 			}
 		}
@@ -28,8 +27,7 @@ func sessionMiddleware() gin.HandlerFunc {
 
 func init() {
 	config.Initialize()
-	db := config.ConnectDB()
-	db.AutoMigrate(&model.User{}, &model.Event{})
+	model.Initialize()
 }
 
 func main() {

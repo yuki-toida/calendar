@@ -1,14 +1,22 @@
 <template>
   <div>
-    <p v-if="user" class="h5 my-3">
-      <img v-bind:src="user.photo" class="rounded" width="auto" height="50">
-      {{ user.name }}
-      {{ user.id }}
-    </p>
-    <p v-else class="h5 my-3">
-      {{ $route.params.id }}
-    </p>
-    <table class="table table-hover">
+    <!-- <img v-bind:src="user.photo" class="rounded" width="auto" height="50">
+    {{ user.name }}
+    {{ user.id }} -->
+    <div class="row my-3">
+      <div class="col-sm-4">
+        <div class="input-group">
+          <input type="text" class="form-control" v-model="email" placeholder="example" aria-describedby="addon">
+          <div class="input-group-append">
+            <span class="input-group-text" id="addon">{{ $store.state.emailDomain }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <button class="btn btn-outline-secondary" type="button" v-on:click="search">検索</button>
+      </div>
+    </div>
+    <table v-if="0 < events.length" class="table table-borderless table-hover">
       <tbody>
         <tr v-for="(event, index) in events" v-bind:key="index">
           <th scope="row">
@@ -24,6 +32,10 @@
         </tr>
       </tbody>
     </table>
+    <div v-else class="text-secondary">
+      参加履歴がありません<br/>
+      {{ $route.params.id }} さんを誘ってみましょう
+    </div>
   </div>
 </template>
 
@@ -42,20 +54,30 @@ export default {
     return {
       user: null,
       events: [],
+      email: this.$route.params.id.replace(this.$store.state.emailDomain, ''),
     }
   },
   created: function() {
-    http.get(`/users/${this.$route.params.id}`)
-      .then((data) => {
-        console.log(data);
-        this.user = data.user;
-        this.events = data.events;
-      })
-      .catch((error) => {
-        this.$toasted.show(error);
-      })
+    this.fetch();
   },
   methods: {
+    fetch() {
+      http.get(`/users/${this.$route.params.id}`)
+        .then((data) => {
+          this.user = data.user;
+          this.events = data.events;
+        })
+        .catch((error) => this.$toasted.show(error));
+    },
+    search() {
+      if (this.email.includes('@')) {
+        this.$toasted.show(this.$store.state.emailDomain + '以降は不要です');
+      } else {
+        const id = this.email + this.$store.state.emailDomain;
+        this.$router.push({ name: 'User', params: { id: id } });
+        this.fetch();
+      }
+    },
     format(date) {
       if (typeof(date) == 'string') {
         date = new Date(date);
@@ -65,3 +87,10 @@ export default {
   }
 }
 </script>
+
+<style>
+.table-borderless td,
+.table-borderless th {
+    border: 0;
+}
+</style>
