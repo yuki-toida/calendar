@@ -1,12 +1,16 @@
 #!/bin/sh
 
-if [ "$1" != "dev" ] && [ "$1" != "prod" ]; then
-  echo "error. \$1 undefined env (dev or prod)"
+if [ "$1" != "dev" ]; then
+  echo "error. \$1 undefined env (dev)"
   exit 1
 fi
 
 # node process kill
 killall node
+
+cd assets
+yarn deploy &
+cd ../
 
 ENV=$1
 REGISTRY=asia.gcr.io/planet-pluto-$ENV

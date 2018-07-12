@@ -1,5 +1,6 @@
 <template>
   <div>
+    <img src="/static/img/header.jpg" alt="" class="img-thumbnail">
     <div class="row my-3">
       <div class="col-sm-6">
         <p>

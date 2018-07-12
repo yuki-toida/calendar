@@ -87,10 +87,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.table-borderless td,
-.table-borderless th {
-    border: 0;
-}
-</style>

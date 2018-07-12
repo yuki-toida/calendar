@@ -8,7 +8,7 @@ docker-compose up -d
 
 cd assets
 yarn install
-yarn run watch &
+yarn watch &
 cd ../
 
 # dep ensure -update -v

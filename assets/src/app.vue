@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light">
       <router-link class="navbar-brand" v-bind:to="{ name: 'Calendar' }">
         <img v-bind:src="'/static/img/logo.jpg'" width="30" height="auto" class="d-inline-block align-top" alt="">
         Knowmeカレンダー<span class="text-muted">（β版)</span>
@@ -55,3 +55,18 @@ export default {
   }  
 }
 </script>
+
+<style>
+.table-borderless td,
+.table-borderless th {
+  border: 0;
+}
+.bg-danger,
+.badge-danger {
+  background-color: #e72e5a !important;
+}
+.bg-success,
+.badge-success {
+  background-color: #3fbbb9 !important;
+}
+</style>

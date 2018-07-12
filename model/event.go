@@ -14,8 +14,8 @@ const dayCategory = "day"
 const nightCategory = "night"
 const myDayClass = "text-white bg-danger rounded"
 const dayClass = "text-white bg-danger rounded"
-const myNightClass = "text-white bg-primary rounded"
-const nightClass = "text-white bg-primary rounded"
+const myNightClass = "text-white bg-success rounded"
+const nightClass = "text-white bg-success rounded"
 
 // Event struct
 type Event struct {

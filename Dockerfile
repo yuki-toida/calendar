@@ -2,8 +2,8 @@ FROM golang:latest as builder
 WORKDIR /go/src/github.com/yuki-toida/knowme/
 COPY . .
 RUN go get -u github.com/golang/dep/cmd/dep && \
-    dep ensure -v && \
-    CGO_ENABLED=0 GOOS=linux ENV=dev go build -o app .
+    dep ensure && \
+    CGO_ENABLED=0 GOOS=linux GIN_MODE=release ENV=dev go build -o app .
 
 FROM alpine:latest
 EXPOSE 8080
