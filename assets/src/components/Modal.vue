@@ -23,7 +23,7 @@
           </div>
         </div>
         <div class="modal-footer">            
-          <button type="button" class="btn btn-outline-dark" v-bind:class="{ disabled: category == null }" v-on:click="join">参加する</button>
+          <button type="button" class="btn btn-outline-secondary" v-bind:class="{ disabled: category == null }" v-on:click="join">参加する</button>
         </div>
       </div>
     </div>
@@ -69,7 +69,8 @@ export default {
       if (this.category == null) return;
       http.post('/events', {category: this.category, date: this.date})
         .then((data) => {
-          window.location.reload();
+          this.hide();
+          this.$emit('join');
         })
         .catch((error) => {
           this.hide();

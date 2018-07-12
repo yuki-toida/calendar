@@ -22,22 +22,21 @@ function createStore(data) {
     strict: false,
     state: {
       emailDomain: data.emailDomain,
-      events: data.events,
       user: data.user,
-      myEvent: data.myEvent,
-      dayEventRest: data.dayEventRest,
-      nightEventRest: data.nightEventRest,
     },
     getters: {
       isSignIn: state => state.user != null,
     },
     mutations: {
-      addEvent(state, payload) {
-        state.events.push(payload);
+      setUser(state, user) {
+        state.user = user;
       },
-      removeEvent(state, payload) {
-        const event = state.events.find(x => x.id === payload.id);
-        state.events.splice(state.events.indexOf(event), 1);
+      addEvent(state, event) {
+        state.events.push(event);
+      },
+      removeEvent(state, event) {
+        const ev = state.events.find(x => x.id === event.id);
+        state.events.splice(state.events.indexOf(ev), 1);
       },
     },
   });
@@ -54,7 +53,6 @@ firebase.initializeApp({
 });
 
 http.get('/initial').then((data) => {
-  console.log(data);
   new Vue({
     el: '#app',
     router,

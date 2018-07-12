@@ -13,7 +13,7 @@ export default new Router({
       component: Calendar,
     },
     {
-      path: '/users/:id',
+      path: '/users/search/:id',
       name: 'User',
       component: User,
     },

@@ -14,9 +14,7 @@ function handle(res, resolve, reject) {
 
 class Http {
   constructor() {
-    this.domain = process.env.NODE_ENV === 'development'
-      ? 'http://localhost:8080'
-      : 'https://knowme.theliveup.tv';
+    this.domain = process.env.API_HOST;
   }
 
   get(path) {

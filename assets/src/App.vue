@@ -16,7 +16,7 @@
         <li v-if="$store.getters.isSignIn" class="nav-item">
           {{ $store.state.user.id }}
         <li v-else class="nav-item">
-          <button class="btn btn-outline-success" v-on:click="signIn">
+          <button class="btn btn-outline-secondary" v-on:click="signIn">
             {{ $store.state.emailDomain }} でサインイン
           </button>
         </li>
@@ -41,17 +41,19 @@ export default {
           name: result.user.displayName,
           photo: result.user.photoURL,
         })
-        .then(() => window.location.reload())
+        .then((data) => this.$store.commit('setUser', data.user))
         .catch(error => this.$toasted.show(error));
-      }).catch((error) => console.log(error));
+      })
+      .catch((error) => console.log(error));
     },
-    signOut: function() {
-      firebase.auth().signOut().then(() => {
-        http.delete('/signout')
-        .then(() => window.location.reload())
-        .catch(error => this.$toasted.show(error));
-      }).catch((error) => console.log(error));
-    }
+    // signOut: function() {
+    //   firebase.auth().signOut().then(() => {
+    //     http.delete('/signout')
+    //     .then(() => this.store.commit('setUser', null))
+    //     .catch(error => this.$toasted.show(error));
+    //   })
+    //   .catch((error) => console.log(error));
+    // }
   }  
 }
 </script>

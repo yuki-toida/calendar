@@ -45,14 +45,15 @@ func main() {
 	router.GET("/initial", controller.HomeInitial)
 	router.POST("/signin", controller.HomeSignIn)
 	router.DELETE("/signout", controller.HomeSignOut)
+	users := router.Group("/users")
+	{
+		users.GET("/events", controller.UserEvents)
+		users.GET("/search/:id", controller.User)
+	}
 	events := router.Group("/events")
 	{
 		events.POST("/", controller.EventAdd)
 		events.PUT("/", controller.EventDelete)
-	}
-	users := router.Group("/users")
-	{
-		users.GET("/:id", controller.User)
 	}
 
 	router.Run(":" + config.Config.Server.Port)

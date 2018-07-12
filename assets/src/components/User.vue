@@ -3,7 +3,7 @@
     <!-- <img v-bind:src="user.photo" class="rounded" width="auto" height="50">
     {{ user.name }}
     {{ user.id }} -->
-    <div class="row my-3">
+    <div class="row my-2">
       <div class="col-sm-4">
         <div class="input-group">
           <input type="text" class="form-control" v-model="email" placeholder="example" aria-describedby="addon">
@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     fetch() {
-      http.get(`/users/${this.$route.params.id}`)
+      http.get(`/users/search/${this.$route.params.id}`)
         .then((data) => {
           this.user = data.user;
           this.events = data.events;

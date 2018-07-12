@@ -15,5 +15,5 @@ WORKDIR /opt/app
 COPY --from=builder /go/src/github.com/yuki-toida/knowme/app .
 COPY --from=builder /go/src/github.com/yuki-toida/knowme/index.html .
 COPY --from=builder /go/src/github.com/yuki-toida/knowme/config ./config
-COPY --from=builder /go/src/github.com/yuki-toida/knowme/static ./static
+COPY --from=builder /go/src/github.com/yuki-toida/knowme/assets/dist ./static
 CMD ["./app"]

@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = (_, argv) => ({
   entry: './src/index.js',
@@ -9,7 +10,7 @@ module.exports = (_, argv) => ({
     filename: 'app.js',
     path: argv.mode == 'development'
       ? path.resolve(__dirname, '../static/js')
-      : path.resolve(__dirname, '../static/js')
+      : path.resolve(__dirname, './dist/js')
   },
   devtool: 'source-map',
   module: {
@@ -54,8 +55,18 @@ module.exports = (_, argv) => ({
   },
   plugins: [
     new VueLoaderPlugin(),
+    new Dotenv({
+      path: argv.mode == 'development'
+        ? './env/local.env'
+        : './env/dev.env',
+    }),
     new CopyWebpackPlugin([
-      { from: 'static', to: path.resolve(__dirname, '../static') }
+      {
+        from: 'static',
+        to: argv.mode == 'development'
+          ? path.resolve(__dirname, '../static')
+          : path.resolve(__dirname, './dist'),
+      }
     ]),
     new webpack.ProvidePlugin({
       $: 'jquery',

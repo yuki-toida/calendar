@@ -23,6 +23,7 @@ main
 # static artifacts
 /assets/node_modules
 /assets/yarn-error.log
+/assets/dist
 /static
 
 # mysql volume
