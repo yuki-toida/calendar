@@ -5,16 +5,17 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/yuki-toida/knowme/model"
+	"github.com/yuki-toida/knowme/domain/model/event"
+	"github.com/yuki-toida/knowme/domain/model/user"
 )
 
 // UserEvents func
 func UserEvents(c *gin.Context) {
-	user, _ := getUser(c)
-	dayRest, nightRest := model.GetEventRest(time.Now())
+	entity, _ := getUser(c)
+	dayRest, nightRest := event.GetEventRest(time.Now())
 	c.JSON(http.StatusOK, gin.H{
-		"events":         model.GetEvents(user),
-		"myEvent":        model.GetUserEvent(user),
+		"events":         event.GetEvents(entity),
+		"myEvent":        user.GetEvent(entity),
 		"dayEventRest":   dayRest,
 		"nightEventRest": nightRest,
 	})
@@ -23,7 +24,7 @@ func UserEvents(c *gin.Context) {
 // User func
 func User(c *gin.Context) {
 	id := c.Param("id")
-	user, events := model.GetUserEvents(id)
+	user, events := user.GetEvents(id)
 	c.JSON(http.StatusOK, gin.H{
 		"user":   user,
 		"events": events,

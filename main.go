@@ -2,40 +2,41 @@ package main
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 
 	"github.com/yuki-toida/knowme/config"
-	"github.com/yuki-toida/knowme/controller"
-	"github.com/yuki-toida/knowme/model"
+	"github.com/yuki-toida/knowme/infrastructure/repository"
+	"github.com/yuki-toida/knowme/interface/controller"
+	"github.com/yuki-toida/knowme/interface/middleware"
+	"github.com/yuki-toida/knowme/registry"
 )
 
-func sessionMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if !strings.HasPrefix(c.Request.URL.Path, "/static") {
-			session := sessions.Default(c)
-			if id := session.Get(config.SessionName); id != nil {
-				user := model.GetUser(id.(string))
-				c.Set(config.SessionName, user)
-			}
-		}
-	}
-}
-
-func init() {
-	config.Initialize()
-	model.Initialize()
-}
-
 func main() {
-	router := gin.Default()
-	store := sessions.NewCookieStore([]byte("secret"))
+	config.Init()
 
+	connectionString := "root:zaqroot@tcp(" + config.Config.Db.Host + ":" + config.Config.Db.Port + ")/" + config.Config.Db.Name + "?charset=utf8&parseTime=True&loc=Local"
+	db, err := gorm.Open("mysql", connectionString)
+	if err != nil {
+		panic(err.Error())
+	}
+	db.LogMode(true)
+	// db.AutoMigrate(&user.User{}, &event.Event{})
+	// defer db.Close()
+
+	registry := registry.Registry{
+		UserRepository: user.New(db),
+	}
+
+	router := gin.Default()
+
+	router.Use(middleware.AddRegistry(registry))
+	store := sessions.NewCookieStore([]byte("secret"))
 	router.Use(sessions.Sessions("_knowme", store))
-	router.Use(sessionMiddleware())
+	router.Use(middleware.AddSession())
 
 	router.StaticFS("/static", http.Dir("static"))
 	router.LoadHTMLFiles("index.html")

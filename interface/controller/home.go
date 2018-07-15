@@ -2,13 +2,15 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 
+	service "github.com/yuki-toida/knowme/application/service/user"
 	"github.com/yuki-toida/knowme/config"
-	"github.com/yuki-toida/knowme/model"
+	"github.com/yuki-toida/knowme/domain/model"
+	"github.com/yuki-toida/knowme/interface/middleware"
 )
 
 func handleError(c *gin.Context, err error) {
@@ -16,10 +18,6 @@ func handleError(c *gin.Context, err error) {
 }
 
 func getUser(c *gin.Context) (*model.User, error) {
-	user, exists := c.Get(config.SessionName)
-	if exists {
-		return user.(*model.User), nil
-	}
 	return nil, errors.New("セッションユーザーが存在していません")
 }
 
@@ -35,9 +33,12 @@ func HomeIndex(c *gin.Context) {
 
 // HomeInitial func
 func HomeInitial(c *gin.Context) {
-	user, _ := getUser(c)
+	id, _ := middleware.GetSessionID(c)
+	registry := middleware.GetRegistry(c)
+	user := service.Get(registry.UserRepository, id)
+	fmt.Printf("%+v\n%+v\n%+v\n", id, registry, user)
 	c.JSON(http.StatusOK, gin.H{
-		"emailDomain": model.EmailDomain,
+		"emailDomain": config.Config.EmailDomain,
 		"user":        user,
 	})
 }
@@ -52,13 +53,13 @@ func HomeSignIn(c *gin.Context) {
 	if err := c.ShouldBindJSON(&params); err != nil {
 		handleError(c, err)
 	} else {
-		user, err := model.SignIn(params.Email, params.Name, params.Photo)
+		registry := middleware.GetRegistry(c)
+		user, err := service.SignIn(registry.UserRepository, params.Email, params.Name, params.Photo)
+
 		if err != nil {
 			handleError(c, err)
 		} else {
-			session := sessions.Default(c)
-			session.Set(config.SessionName, user.ID)
-			session.Save()
+			middleware.SetSession(c, user.ID)
 			c.JSON(http.StatusOK, gin.H{"user": user})
 		}
 	}
@@ -66,8 +67,6 @@ func HomeSignIn(c *gin.Context) {
 
 // HomeSignOut func
 func HomeSignOut(c *gin.Context) {
-	session := sessions.Default(c)
-	session.Clear()
-	session.Save()
+	middleware.DeleteSession(c)
 	c.JSON(http.StatusOK, gin.H{})
 }
