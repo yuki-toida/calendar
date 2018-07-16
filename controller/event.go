@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/yuki-toida/knowme/domain/model/event"
+	"github.com/yuki-toida/knowme/model"
 )
 
 // EventAdd func
@@ -21,7 +21,7 @@ func EventAdd(c *gin.Context) {
 		if err != nil {
 			handleError(c, err)
 		}
-		event, err := event.AddEvent(user, params.Category, params.Date.In(time.Local))
+		event, err := model.AddEvent(user, params.Category, params.Date.In(time.Local))
 		if err != nil {
 			handleError(c, err)
 		} else {
@@ -43,7 +43,7 @@ func EventDelete(c *gin.Context) {
 		if err != nil {
 			handleError(c, err)
 		}
-		event, err := event.DeleteEvent(user, params.Category, params.Date.In(time.Local))
+		event, err := model.DeleteEvent(user, params.Category, params.Date.In(time.Local))
 		if err != nil {
 			handleError(c, err)
 		} else {

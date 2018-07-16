@@ -7,13 +7,13 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-const emailDomain = "@candee.co.jp"
+// SessionName const
+const SessionName = "ID"
 
 // Config struct
 var Config struct {
-	Env         string
-	EmailDomain string
-	Server      struct {
+	Env    string
+	Server struct {
 		Host string `toml:"host"`
 		Port string `toml:"port"`
 	}
@@ -24,14 +24,13 @@ var Config struct {
 	}
 }
 
-// Init func
-func Init() {
+// Initialize func
+func Initialize() {
 	env := os.Getenv("ENV")
 	_, err := toml.DecodeFile("config/"+env+".toml", &Config)
 	if err != nil {
 		panic(err)
 	}
 	Config.Env = env
-	Config.EmailDomain = emailDomain
 	fmt.Printf("[CONFIG] : %+v\n", Config)
 }
