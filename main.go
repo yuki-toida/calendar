@@ -2,58 +2,45 @@ package main
 
 import (
 	"net/http"
-	"strings"
 
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 
 	"github.com/yuki-toida/knowme/config"
-	"github.com/yuki-toida/knowme/controller"
-	"github.com/yuki-toida/knowme/model"
+	"github.com/yuki-toida/knowme/interface/handler"
+	"github.com/yuki-toida/knowme/interface/middleware/session"
 )
-
-func sessionMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if !strings.HasPrefix(c.Request.URL.Path, "/static") {
-			session := sessions.Default(c)
-			if id := session.Get(config.SessionName); id != nil {
-				user := model.GetUser(id.(string))
-				c.Set(config.SessionName, user)
-			}
-		}
-	}
-}
 
 func init() {
 	config.Initialize()
-	model.Initialize()
+	// model.Initialize()
 }
 
 func main() {
 	router := gin.Default()
-	store := sessions.NewCookieStore([]byte("secret"))
-
-	router.Use(sessions.Sessions("_knowme", store))
-	router.Use(sessionMiddleware())
+	session.AddMiddleware(router)
 
 	router.StaticFS("/static", http.Dir("static"))
 	router.LoadHTMLFiles("index.html")
 
-	router.GET("/healthz", controller.HomeHealthz)
-	router.GET("/", controller.HomeIndex)
-	router.GET("/initial", controller.HomeInitial)
-	router.POST("/signin", controller.HomeSignIn)
-	router.DELETE("/signout", controller.HomeSignOut)
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{})
+	})
+	router.GET("/healthz", func(c *gin.Context) {
+		c.String(http.StatusOK, "OK")
+	})
+	router.GET("/initial", func(c *gin.Context) { handler.GETInitial(c) })
+	router.POST("/signin", func(c *gin.Context) { handler.POSTSignIn(c) })
+	router.DELETE("/signout", func(c *gin.Context) { handler.DELETESignOut(c) })
 	users := router.Group("/users")
 	{
-		users.GET("/events", controller.UserEvents)
-		users.GET("/search/:id", controller.User)
+		users.GET("/events", func(c *gin.Context) { handler.GETUserEvent(c) })
+		users.GET("/search/:id", func(c *gin.Context) { handler.GETUserSearch(c) })
 	}
 	events := router.Group("/events")
 	{
-		events.POST("/", controller.EventAdd)
-		events.PUT("/", controller.EventDelete)
+		events.POST("/", func(c *gin.Context) { handler.POSTEvent(c) })
+		events.PUT("/", func(c *gin.Context) { handler.PUTEvent(c) })
 	}
 
 	router.Run(":" + config.Config.Server.Port)

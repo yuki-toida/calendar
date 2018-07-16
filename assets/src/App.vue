@@ -17,7 +17,7 @@
           {{ $store.state.user.id }}
         <li v-else class="nav-item">
           <button class="btn btn-outline-secondary" v-on:click="signIn">
-            {{ $store.state.emailDomain }} でサインイン
+            {{ $store.state.domain }} でサインイン
           </button>
         </li>
       </ul>

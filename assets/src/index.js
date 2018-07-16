@@ -21,7 +21,7 @@ function createStore(data) {
   return new Vuex.Store({
     strict: false,
     state: {
-      emailDomain: data.emailDomain,
+      domain: data.domain,
       user: data.user,
     },
     getters: {

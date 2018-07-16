@@ -7,12 +7,12 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// SessionName const
-const SessionName = "ID"
+const domain = "@candee.co.jp"
 
 // Config struct
 var Config struct {
 	Env    string
+	Domain string
 	Server struct {
 		Host string `toml:"host"`
 		Port string `toml:"port"`
@@ -32,5 +32,6 @@ func Initialize() {
 		panic(err)
 	}
 	Config.Env = env
+	Config.Domain = domain
 	fmt.Printf("[CONFIG] : %+v\n", Config)
 }

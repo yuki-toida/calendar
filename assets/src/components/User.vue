@@ -8,7 +8,7 @@
         <div class="input-group">
           <input type="text" class="form-control" v-model="email" placeholder="example" aria-describedby="addon">
           <div class="input-group-append">
-            <span class="input-group-text" id="addon">{{ $store.state.emailDomain }}</span>
+            <span class="input-group-text" id="addon">{{ $store.state.domain }}</span>
           </div>
         </div>
       </div>
@@ -54,7 +54,7 @@ export default {
     return {
       user: null,
       events: [],
-      email: this.$route.params.id.replace(this.$store.state.emailDomain, ''),
+      email: this.$route.params.id.replace(this.$store.state.domain, ''),
     }
   },
   created: function() {
@@ -71,9 +71,9 @@ export default {
     },
     search() {
       if (this.email.includes('@')) {
-        this.$toasted.show(this.$store.state.emailDomain + '以降は不要です');
+        this.$toasted.show(this.$store.state.domain + '以降は不要です');
       } else {
-        const id = this.email + this.$store.state.emailDomain;
+        const id = this.email + this.$store.state.domain;
         this.$router.push({ name: 'User', params: { id: id } });
         this.fetch();
       }
