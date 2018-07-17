@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/yuki-toida/knowme/model"
 )
 
 const name = "id"
@@ -18,25 +17,31 @@ func AddMiddleware(router *gin.Engine) {
 		if !strings.HasPrefix(c.Request.URL.Path, "/static") {
 			session := sessions.Default(c)
 			if id := session.Get(name); id != nil {
-				user := model.GetUser(id.(string))
-				c.Set(name, user)
+				c.Set(name, id)
 			}
 		}
 	})
 }
 
-// Get func
-func Get(c *gin.Context) *model.User {
+// GetID func
+func GetID(c *gin.Context) string {
 	user, exists := c.Get(name)
 	if !exists {
-		return nil
+		return ""
 	}
-	return user.(*model.User)
+	return user.(string)
 }
 
-// Save func
-func Save(c *gin.Context, id string) {
+// SaveID func
+func SaveID(c *gin.Context, id string) {
 	session := sessions.Default(c)
 	session.Set(name, id)
+	session.Save()
+}
+
+// Delete func
+func Delete(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Clear()
 	session.Save()
 }

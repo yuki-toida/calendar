@@ -32,6 +32,7 @@
       v-bind:events="events"
       v-bind:startingDayOfWeek="1"
       v-bind:show-date="showDate"
+      v-bind:disablePast="true"
       v-on:show-date-change="showDateChange"
       v-on:click-date="clickDate"
       v-on:click-event="clickEvent"
@@ -82,7 +83,7 @@ export default {
   },
   methods: {
     fetch() {
-      http.get('/users/events')
+      http.get('/events')
         .then((data) => {
           this.events = data.events;
           this.myEvent = data.myEvent;
@@ -113,7 +114,7 @@ export default {
     },
     clickEvent(event) {
       const id = event.id.split(':').pop();
-      this.$router.push({ name: 'User', params: { id: id } });
+      this.$router.push({ name: 'Search', params: { id: id } });
     },
   }
 }

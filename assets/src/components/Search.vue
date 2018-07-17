@@ -45,7 +45,7 @@ import BadgeDay from './BadgeDay.vue'
 import BadgeNight from './BadgeNight.vue'
 
 export default {
-  name: 'User',
+  name: 'Search',
   components: {
     'badge-day': BadgeDay,
     'badge-night': BadgeNight,
@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     fetch() {
-      http.get(`/users/search/${this.$route.params.id}`)
+      http.get(`/search/${this.$route.params.id}`)
         .then((data) => {
           this.user = data.user;
           this.events = data.events;
@@ -74,7 +74,7 @@ export default {
         this.$toasted.show(this.$store.state.domain + '以降は不要です');
       } else {
         const id = this.email + this.$store.state.domain;
-        this.$router.push({ name: 'User', params: { id: id } });
+        this.$router.push({ name: 'Search', params: { id: id } });
         this.fetch();
       }
     },

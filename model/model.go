@@ -6,80 +6,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jinzhu/gorm"
-	"github.com/yuki-toida/knowme/config"
+	"github.com/yuki-toida/knowme/domain/model"
 )
-
-// User struct
-type User struct {
-	ID        string    `gorm:"primary_key" json:"id"`
-	Name      string    `json:"name"`
-	Photo     string    `json:"photo"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
-}
-
-// UserEvent struct
-type UserEvent struct {
-	Date     time.Time `json:"date"`
-	Category string    `json:"category"`
-	Titles   []string  `json:"titles"`
-}
-
-// Event struct
-type Event struct {
-	Year      int       `gorm:"primary_key;type:int" json:"-"`
-	Month     int       `gorm:"primary_key;type:int" json:"-"`
-	ID        string    `gorm:"primary_key" json:"-"`
-	EventID   string    `gorm:"unique;not null" json:"id"`
-	Title     string    `gorm:"not null" json:"title"`
-	StartDate time.Time `gorm:"type:date;not null" json:"startDate"`
-	EndDate   time.Time `gorm:"type:date;not null" json:"endDate"`
-	Category  string    `gorm:"not null" json:"-"`
-	Classes   string    `gorm:"-" json:"classes"`
-	CreatedAt time.Time `json:"-"`
-	UpdatedAt time.Time `json:"-"`
-}
-
-// DB var
-var DB *gorm.DB
-
-// Initialize func
-func Initialize() {
-	connectionString := "root:zaqroot@tcp(" + config.Config.Db.Host + ":" + config.Config.Db.Port + ")/" + config.Config.Db.Name + "?charset=utf8&parseTime=True&loc=Local"
-	db, err := gorm.Open("mysql", connectionString)
-	if err != nil {
-		panic(err.Error())
-	}
-	db.LogMode(true)
-	db.AutoMigrate(&User{}, &Event{})
-	DB = db
-}
 
 func format(date time.Time) string {
 	return date.Format("2006-01-02")
 }
 
-// SignIn func
-func SignIn(id, name, photo string) (*User, error) {
-	if id == "" || !strings.Contains(id, config.Config.Domain) {
-		return nil, errors.New(config.Config.Domain + "を指定してください")
-	}
-	user := &User{
-		ID:    id,
-		Name:  name,
-		Photo: photo,
-	}
-	if GetUser(id) == nil {
-		DB.Create(user)
-	} else {
-		DB.Save(user)
-	}
-	return user, nil
-}
-
 // GetUserEvent func
-func GetUserEvent(user *User) *UserEvent {
+func GetUserEvent(user *model.User) *model.UserEvent {
 	if user == nil {
 		return nil
 	}
@@ -88,47 +23,13 @@ func GetUserEvent(user *User) *UserEvent {
 	if myEvent == nil {
 		return nil
 	}
-	var events []Event
-	DB.Where(&Event{StartDate: myEvent.StartDate, Category: myEvent.Category}).Find(&events)
-	return &UserEvent{
+	var events []model.Event
+	model.DB.Where(&model.Event{StartDate: myEvent.StartDate, Category: myEvent.Category}).Find(&events)
+	return &model.UserEvent{
 		Date:     myEvent.StartDate,
 		Category: myEvent.Category,
 		Titles:   getEventTitles(events, myEvent.StartDate, myEvent.Category),
 	}
-}
-
-// GetUserEvents func
-func GetUserEvents(id string) (*User, []UserEvent) {
-	allEvents := GetAllEvents()
-	myEvents := []Event{}
-	for _, v := range allEvents {
-		if v.ID == id {
-			myEvents = append(myEvents, v)
-		}
-	}
-	events := []UserEvent{}
-	for _, v := range myEvents {
-		userEvent := UserEvent{
-			Date:     v.StartDate,
-			Category: v.Category,
-			Titles:   getEventTitles(allEvents, v.StartDate, v.Category),
-		}
-		events = append(events, userEvent)
-	}
-	return GetUser(id), events
-}
-
-// GetUser func
-func GetUser(id string) *User {
-	if id == "" {
-		return nil
-	}
-	var user User
-	DB.Where(&User{ID: id}).First(&user)
-	if user == (User{}) {
-		return nil
-	}
-	return &user
 }
 
 const eventCapacity = 3
@@ -146,7 +47,7 @@ func isDay(category string) bool {
 }
 
 // GetEvents func
-func GetEvents(user *User) []Event {
+func GetEvents(user *model.User) []model.Event {
 	events := GetAllEvents()
 	for i := range events {
 		event := &events[i]
@@ -179,14 +80,14 @@ func GetEventRest(date time.Time) (int, int) {
 }
 
 // GetAllEvents func
-func GetAllEvents() []Event {
-	var events []Event
-	DB.Find(&events)
+func GetAllEvents() []model.Event {
+	var events []model.Event
+	model.DB.Find(&events)
 	return events
 }
 
 // AddEvent func
-func AddEvent(user *User, category string, date time.Time) (*Event, error) {
+func AddEvent(user *model.User, category string, date time.Time) (*model.Event, error) {
 	year := date.Year()
 	month := int(date.Month())
 	if getEvent(year, month, user.ID) != nil {
@@ -208,7 +109,7 @@ func AddEvent(user *User, category string, date time.Time) (*Event, error) {
 	} else {
 		classes = myNightClass
 	}
-	event := &Event{
+	event := &model.Event{
 		Year:      date.Year(),
 		Month:     int(date.Month()),
 		ID:        user.ID,
@@ -219,32 +120,20 @@ func AddEvent(user *User, category string, date time.Time) (*Event, error) {
 		Category:  category,
 		Classes:   classes,
 	}
-	DB.Create(event)
+	model.DB.Create(event)
 	return event, nil
 }
 
-// DeleteEvent func
-func DeleteEvent(user *User, category string, date time.Time) (*Event, error) {
-	year := date.Year()
-	month := int(date.Month())
-	event := getEvent(year, month, user.ID)
-	if event == nil {
-		return nil, errors.New("参加していません")
-	}
-	DB.Delete(event)
-	return event, nil
-}
-
-func getEvent(year, month int, id string) *Event {
-	var event Event
-	DB.Where(&Event{Year: year, Month: month, ID: id}).First(&event)
-	if event == (Event{}) {
+func getEvent(year, month int, id string) *model.Event {
+	var event model.Event
+	model.DB.Where(&model.Event{Year: year, Month: month, ID: id}).First(&event)
+	if event == (model.Event{}) {
 		return nil
 	}
 	return &event
 }
 
-func getEventTitles(events []Event, date time.Time, category string) []string {
+func getEventTitles(events []model.Event, date time.Time, category string) []string {
 	titles := []string{}
 	for _, v := range events {
 		if v.StartDate == date && v.Category == category {
@@ -256,7 +145,7 @@ func getEventTitles(events []Event, date time.Time, category string) []string {
 
 func verifyEventCapacity(year, month int, date time.Time, category string) bool {
 	var count int
-	DB.Model(&Event{}).Where(&Event{Year: year, Month: month, StartDate: date, Category: category}).Count(&count)
+	model.DB.Model(&model.Event{}).Where(&model.Event{Year: year, Month: month, StartDate: date, Category: category}).Count(&count)
 	return count < eventCapacity
 }
 
@@ -269,9 +158,9 @@ func verifyCategoryCapacity(year, month int, category string) bool {
 }
 
 func verifySameID(year, month int, date time.Time, category, id string) []string {
-	var yearEvents []Event
-	DB.Where(&Event{Year: year}).Find(&yearEvents)
-	myEvents := []Event{}
+	var yearEvents []model.Event
+	model.DB.Where(&model.Event{Year: year}).Find(&yearEvents)
+	myEvents := []model.Event{}
 	for _, v := range yearEvents {
 		if v.ID == id {
 			myEvents = append(myEvents, v)
@@ -302,6 +191,6 @@ func verifySameID(year, month int, date time.Time, category, id string) []string
 
 func count(year, month int, category string) int {
 	var count int
-	DB.Model(&Event{}).Where(&Event{Year: year, Month: month, Category: category}).Count(&count)
+	model.DB.Model(&model.Event{}).Where(&model.Event{Year: year, Month: month, Category: category}).Count(&count)
 	return count
 }

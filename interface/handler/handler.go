@@ -4,12 +4,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/yuki-toida/knowme/config"
-
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/yuki-toida/knowme/config"
 	"github.com/yuki-toida/knowme/interface/middleware/session"
+	"github.com/yuki-toida/knowme/interface/registry"
 	"github.com/yuki-toida/knowme/model"
+	"github.com/yuki-toida/knowme/usecase/event"
+	"github.com/yuki-toida/knowme/usecase/user"
 )
 
 func handleError(c *gin.Context, err error) {
@@ -17,8 +18,10 @@ func handleError(c *gin.Context, err error) {
 }
 
 // GETInitial func
-func GETInitial(c *gin.Context) {
-	user := session.Get(c)
+func GETInitial(c *gin.Context, r *registry.Registry) {
+	id := session.GetID(c)
+	uc := user.New(r.UserRepository, r.EventRepository)
+	user := uc.Get(id)
 	c.JSON(http.StatusOK, gin.H{
 		"domain": config.Config.Domain,
 		"user":   user,
@@ -26,7 +29,7 @@ func GETInitial(c *gin.Context) {
 }
 
 // POSTSignIn func
-func POSTSignIn(c *gin.Context) {
+func POSTSignIn(c *gin.Context, r *registry.Registry) {
 	var params struct {
 		Email string `json:"email"`
 		Name  string `json:"name"`
@@ -35,27 +38,40 @@ func POSTSignIn(c *gin.Context) {
 	if err := c.ShouldBindJSON(&params); err != nil {
 		handleError(c, err)
 	} else {
-		user, err := model.SignIn(params.Email, params.Name, params.Photo)
+		uc := user.New(r.UserRepository, r.EventRepository)
+		user, err := uc.SignIn(params.Email, params.Name, params.Photo)
 		if err != nil {
 			handleError(c, err)
 		} else {
-			session.Save(c, user.ID)
+			session.SaveID(c, user.ID)
 			c.JSON(http.StatusOK, gin.H{"user": user})
 		}
 	}
 }
 
 // DELETESignOut func
-func DELETESignOut(c *gin.Context) {
-	session := sessions.Default(c)
-	session.Clear()
-	session.Save()
+func DELETESignOut(c *gin.Context, r *registry.Registry) {
+	session.Delete(c)
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-// GETUserEvent func
-func GETUserEvent(c *gin.Context) {
-	user := session.Get(c)
+// GETSearch func
+func GETSearch(c *gin.Context, r *registry.Registry) {
+	id := c.Param("id")
+	uc := user.New(r.UserRepository, r.EventRepository)
+	user, events := uc.Search(id)
+	c.JSON(http.StatusOK, gin.H{
+		"user":   user,
+		"events": events,
+	})
+}
+
+// GETEvent func
+func GETEvent(c *gin.Context, r *registry.Registry) {
+	id := session.GetID(c)
+	uc := user.New(r.UserRepository, r.EventRepository)
+	user := uc.Get(id)
+
 	dayRest, nightRest := model.GetEventRest(time.Now())
 	c.JSON(http.StatusOK, gin.H{
 		"events":         model.GetEvents(user),
@@ -65,18 +81,8 @@ func GETUserEvent(c *gin.Context) {
 	})
 }
 
-// GETUserSearch func
-func GETUserSearch(c *gin.Context) {
-	id := c.Param("id")
-	user, events := model.GetUserEvents(id)
-	c.JSON(http.StatusOK, gin.H{
-		"user":   user,
-		"events": events,
-	})
-}
-
 // POSTEvent func
-func POSTEvent(c *gin.Context) {
+func POSTEvent(c *gin.Context, r *registry.Registry) {
 	var params struct {
 		Category string    `json:"category"`
 		Date     time.Time `json:"date"`
@@ -84,7 +90,9 @@ func POSTEvent(c *gin.Context) {
 	if err := c.ShouldBindJSON(&params); err != nil {
 		handleError(c, err)
 	} else {
-		user := session.Get(c)
+		id := session.GetID(c)
+		uc := user.New(r.UserRepository, r.EventRepository)
+		user := uc.Get(id)
 		event, err := model.AddEvent(user, params.Category, params.Date.In(time.Local))
 		if err != nil {
 			handleError(c, err)
@@ -95,7 +103,7 @@ func POSTEvent(c *gin.Context) {
 }
 
 // PUTEvent func
-func PUTEvent(c *gin.Context) {
+func PUTEvent(c *gin.Context, r *registry.Registry) {
 	var params struct {
 		Category string    `json:"category"`
 		Date     time.Time `json:"date"`
@@ -103,8 +111,9 @@ func PUTEvent(c *gin.Context) {
 	if err := c.ShouldBindJSON(&params); err != nil {
 		handleError(c, err)
 	} else {
-		user := session.Get(c)
-		event, err := model.DeleteEvent(user, params.Category, params.Date.In(time.Local))
+		id := session.GetID(c)
+		uc := event.New(r.EventRepository)
+		event, err := uc.Delete(id, params.Category, params.Date.In(time.Local))
 		if err != nil {
 			handleError(c, err)
 		} else {

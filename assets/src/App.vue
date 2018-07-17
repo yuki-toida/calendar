@@ -7,7 +7,7 @@
       </router-link>
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <router-link class="nav-link" v-if="$store.getters.isSignIn" v-bind:to="{ name: 'User', params: { id: $store.state.user.id } }">
+          <router-link class="nav-link" v-if="$store.getters.isSignIn" v-bind:to="{ name: 'Search', params: { id: $store.state.user.id } }">
             履歴
           </router-link>
         </li>
