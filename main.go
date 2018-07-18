@@ -28,13 +28,11 @@ func main() {
 	}
 	db.LogMode(true)
 	db.AutoMigrate(&model.User{}, &model.Event{})
-	model.DB = db
 
-	registry := registry.New(user.New(db), event.New(db))
+	registry := registry.NewRegistry(user.NewRepository(db), event.NewRepository(db))
 
 	router := gin.Default()
 	session.AddMiddleware(router)
-
 	router.StaticFS("/static", http.Dir("static"))
 	router.LoadHTMLFiles("index.html")
 
@@ -44,7 +42,6 @@ func main() {
 	router.GET("/healthz", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK")
 	})
-
 	router.GET("/initial", func(c *gin.Context) { handler.GETInitial(c, registry) })
 	router.POST("/signin", func(c *gin.Context) { handler.POSTSignIn(c, registry) })
 	router.DELETE("/signout", func(c *gin.Context) { handler.DELETESignOut(c, registry) })

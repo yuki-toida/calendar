@@ -2,12 +2,7 @@ package model
 
 import (
 	"time"
-
-	"github.com/jinzhu/gorm"
 )
-
-// DB var
-var DB *gorm.DB
 
 // User struct
 type User struct {

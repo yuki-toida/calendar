@@ -15,8 +15,8 @@ type UseCase struct {
 	EventRepository repository.Event
 }
 
-// New func
-func New(u repository.User, e repository.Event) *UseCase {
+// NewUseCase func
+func NewUseCase(u repository.User, e repository.Event) *UseCase {
 	return &UseCase{
 		UserRepository:  u,
 		EventRepository: e,
@@ -42,9 +42,9 @@ func (u *UseCase) SignIn(email, name, photo string) (*model.User, error) {
 		Photo: photo,
 	}
 	if u.Get(email) == nil {
-		model.DB.Create(user)
+		u.UserRepository.Create(user)
 	} else {
-		model.DB.Save(user)
+		u.UserRepository.Update(user)
 	}
 	return user, nil
 }
@@ -52,25 +52,25 @@ func (u *UseCase) SignIn(email, name, photo string) (*model.User, error) {
 // Search func
 func (u *UseCase) Search(id string) (*model.User, []*model.UserEvent) {
 	all := u.EventRepository.FindAll()
-	myEvents := []*model.Event{}
+	events := []*model.Event{}
 	for _, v := range all {
 		if v.ID == id {
-			myEvents = append(myEvents, v)
+			events = append(events, v)
 		}
 	}
-	events := []*model.UserEvent{}
-	for _, v := range myEvents {
+	results := []*model.UserEvent{}
+	for _, v := range events {
 		titles := []string{}
 		for _, w := range all {
 			if v.StartDate == w.StartDate && v.Category == w.Category {
 				titles = append(titles, w.Title)
 			}
 		}
-		events = append(events, &model.UserEvent{
+		results = append(results, &model.UserEvent{
 			Date:     v.StartDate,
 			Category: v.Category,
 			Titles:   titles,
 		})
 	}
-	return u.Get(id), events
+	return u.Get(id), results
 }

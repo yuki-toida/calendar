@@ -4,22 +4,22 @@
     <div class="row my-2">
       <div class="col-sm-6">
         <p>
-          <badge-day/><span class="ml-3">{{ thisMonth }} 残席 {{ dayEventRest }}</span>
+          <badge-day/><span class="ml-3">{{ thisMonth }} 残席 {{ dayRestCount }}</span>
         </p>
         <p>
-          <badge-night/><span class="ml-3">{{ thisMonth }} 残席 {{ nightEventRest }}</span>
+          <badge-night/><span class="ml-3">{{ thisMonth }} 残席 {{ nightRestCount }}</span>
         </p>
       </div>
       <div class="col-sm-6">
-        <div v-if="myEvent" class="card">
+        <div v-if="event" class="card">
           <div class="card-body">
             <p class="card-text">
-              {{ myEventDate }}
-              <badge-day v-if="myEvent.category == 'day'" v-bind:text="'昼'"/>
+              {{ eventDate }}
+              <badge-day v-if="event.category == 'day'" v-bind:text="'昼'"/>
               <badge-night v-else v-bind:text="'夜'"/>
             </p>
             <ul class="list-inline">
-              <li v-for="title in myEvent.titles" v-bind:key="title" class="list-inline-item">
+              <li v-for="title in event.titles" v-bind:key="title" class="list-inline-item">
                 {{ title }}
               </li>
             </ul>
@@ -32,7 +32,6 @@
       v-bind:events="events"
       v-bind:startingDayOfWeek="1"
       v-bind:show-date="showDate"
-      v-bind:disablePast="true"
       v-on:show-date-change="showDateChange"
       v-on:click-date="clickDate"
       v-on:click-event="clickEvent"
@@ -62,9 +61,9 @@ export default {
       now: new Date(),
       showDate: new Date(),
       events: [],
-      myEvent: null,
-      dayEventRest: null,
-      nightEventRest: null,
+      event: null,
+      dayRestCount: null,
+      nightRestCount: null,
       showModal: false,
       targetDate: null,
     }
@@ -76,8 +75,8 @@ export default {
     thisMonth: function() {
       return `${this.now.getFullYear()}年${this.now.getMonth() + 1}月`;
     },
-    myEventDate: function() {
-      const date = new Date(this.myEvent.date);
+    eventDate: function() {
+      const date = new Date(this.event.date);
       return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
     }
   },
@@ -86,9 +85,9 @@ export default {
       http.get('/events')
         .then((data) => {
           this.events = data.events;
-          this.myEvent = data.myEvent;
-          this.dayEventRest = data.dayEventRest;
-          this.nightEventRest = data.nightEventRest;
+          this.event = data.event;
+          this.dayRestCount = data.dayRestCount;
+          this.nightRestCount = data.nightRestCount;
         })
         .catch((error) => this.$toasted.show(error));
     },
@@ -96,7 +95,7 @@ export default {
       this.showDate = date;
     },
     leave() {
-      http.put('/events', {date: this.myEvent.date, category: this.myEvent.category})
+      http.put('/events', {date: this.event.date, category: this.event.category})
         .then((data) => {
           this.fetch();
         })

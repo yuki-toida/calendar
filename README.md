@@ -7,10 +7,5 @@ Running local server
 sh _run.sh
 ```
 
-Build docker container
-```sh
-sh _build.sh
-```
-
 ## License
 MIT

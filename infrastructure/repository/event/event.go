@@ -10,8 +10,8 @@ type repositoryImpl struct {
 	db *gorm.DB
 }
 
-// New func
-func New(db *gorm.DB) repository.Event {
+// NewRepository func
+func NewRepository(db *gorm.DB) repository.Event {
 	return &repositoryImpl{
 		db: db,
 	}

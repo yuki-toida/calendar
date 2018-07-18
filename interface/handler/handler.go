@@ -8,7 +8,6 @@ import (
 	"github.com/yuki-toida/knowme/config"
 	"github.com/yuki-toida/knowme/interface/middleware/session"
 	"github.com/yuki-toida/knowme/interface/registry"
-	"github.com/yuki-toida/knowme/model"
 	"github.com/yuki-toida/knowme/usecase/event"
 	"github.com/yuki-toida/knowme/usecase/user"
 )
@@ -20,7 +19,7 @@ func handleError(c *gin.Context, err error) {
 // GETInitial func
 func GETInitial(c *gin.Context, r *registry.Registry) {
 	id := session.GetID(c)
-	uc := user.New(r.UserRepository, r.EventRepository)
+	uc := user.NewUseCase(r.UserRepository, r.EventRepository)
 	user := uc.Get(id)
 	c.JSON(http.StatusOK, gin.H{
 		"domain": config.Config.Domain,
@@ -38,7 +37,7 @@ func POSTSignIn(c *gin.Context, r *registry.Registry) {
 	if err := c.ShouldBindJSON(&params); err != nil {
 		handleError(c, err)
 	} else {
-		uc := user.New(r.UserRepository, r.EventRepository)
+		uc := user.NewUseCase(r.UserRepository, r.EventRepository)
 		user, err := uc.SignIn(params.Email, params.Name, params.Photo)
 		if err != nil {
 			handleError(c, err)
@@ -58,7 +57,7 @@ func DELETESignOut(c *gin.Context, r *registry.Registry) {
 // GETSearch func
 func GETSearch(c *gin.Context, r *registry.Registry) {
 	id := c.Param("id")
-	uc := user.New(r.UserRepository, r.EventRepository)
+	uc := user.NewUseCase(r.UserRepository, r.EventRepository)
 	user, events := uc.Search(id)
 	c.JSON(http.StatusOK, gin.H{
 		"user":   user,
@@ -69,15 +68,15 @@ func GETSearch(c *gin.Context, r *registry.Registry) {
 // GETEvent func
 func GETEvent(c *gin.Context, r *registry.Registry) {
 	id := session.GetID(c)
-	uc := user.New(r.UserRepository, r.EventRepository)
-	user := uc.Get(id)
+	user := user.NewUseCase(r.UserRepository, r.EventRepository).Get(id)
+	uc := event.NewUseCase(r.EventRepository)
+	dayRestCount, nightRestCount := uc.GetRestCounts()
 
-	dayRest, nightRest := model.GetEventRest(time.Now())
 	c.JSON(http.StatusOK, gin.H{
-		"events":         model.GetEvents(user),
-		"myEvent":        model.GetUserEvent(user),
-		"dayEventRest":   dayRest,
-		"nightEventRest": nightRest,
+		"events":         uc.Gets(),
+		"event":          uc.GetUserEvent(user),
+		"dayRestCount":   dayRestCount,
+		"nightRestCount": nightRestCount,
 	})
 }
 
@@ -91,9 +90,9 @@ func POSTEvent(c *gin.Context, r *registry.Registry) {
 		handleError(c, err)
 	} else {
 		id := session.GetID(c)
-		uc := user.New(r.UserRepository, r.EventRepository)
-		user := uc.Get(id)
-		event, err := model.AddEvent(user, params.Category, params.Date.In(time.Local))
+		user := user.NewUseCase(r.UserRepository, r.EventRepository).Get(id)
+		uc := event.NewUseCase(r.EventRepository)
+		event, err := uc.AddEvent(user, params.Category, params.Date.In(time.Local))
 		if err != nil {
 			handleError(c, err)
 		} else {
@@ -112,7 +111,7 @@ func PUTEvent(c *gin.Context, r *registry.Registry) {
 		handleError(c, err)
 	} else {
 		id := session.GetID(c)
-		uc := event.New(r.EventRepository)
+		uc := event.NewUseCase(r.EventRepository)
 		event, err := uc.Delete(id, params.Category, params.Date.In(time.Local))
 		if err != nil {
 			handleError(c, err)

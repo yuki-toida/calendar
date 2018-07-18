@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/BurntSushi/toml"
@@ -33,5 +32,4 @@ func Initialize() {
 	}
 	Config.Env = env
 	Config.Domain = domain
-	fmt.Printf("[CONFIG] : %+v\n", Config)
 }

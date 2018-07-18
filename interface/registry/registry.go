@@ -10,8 +10,8 @@ type Registry struct {
 	EventRepository repository.Event
 }
 
-// New func
-func New(u repository.User, e repository.Event) *Registry {
+// NewRegistry func
+func NewRegistry(u repository.User, e repository.Event) *Registry {
 	return &Registry{
 		UserRepository:  u,
 		EventRepository: e,
