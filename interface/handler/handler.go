@@ -12,14 +12,26 @@ import (
 	"github.com/yuki-toida/knowme/usecase/user"
 )
 
+// Handler type
+type Handler struct {
+	registry *registry.Registry
+}
+
+// NewHandler func
+func NewHandler(r *registry.Registry) *Handler {
+	return &Handler{
+		registry: r,
+	}
+}
+
 func handleError(c *gin.Context, err error) {
 	c.JSON(http.StatusOK, gin.H{"error": err.Error()})
 }
 
-// GETInitial func
-func GETInitial(c *gin.Context, r *registry.Registry) {
+// Initial func
+func (h *Handler) Initial(c *gin.Context) {
 	id := session.GetID(c)
-	uc := user.NewUseCase(r.UserRepository, r.EventRepository)
+	uc := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository)
 	user := uc.Get(id)
 	c.JSON(http.StatusOK, gin.H{
 		"domain": config.Config.Domain,
@@ -27,8 +39,8 @@ func GETInitial(c *gin.Context, r *registry.Registry) {
 	})
 }
 
-// POSTSignIn func
-func POSTSignIn(c *gin.Context, r *registry.Registry) {
+// SignIn func
+func (h *Handler) SignIn(c *gin.Context) {
 	var params struct {
 		Email string `json:"email"`
 		Name  string `json:"name"`
@@ -37,7 +49,7 @@ func POSTSignIn(c *gin.Context, r *registry.Registry) {
 	if err := c.ShouldBindJSON(&params); err != nil {
 		handleError(c, err)
 	} else {
-		uc := user.NewUseCase(r.UserRepository, r.EventRepository)
+		uc := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository)
 		user, err := uc.SignIn(params.Email, params.Name, params.Photo)
 		if err != nil {
 			handleError(c, err)
@@ -48,16 +60,16 @@ func POSTSignIn(c *gin.Context, r *registry.Registry) {
 	}
 }
 
-// DELETESignOut func
-func DELETESignOut(c *gin.Context, r *registry.Registry) {
+// SignOut func
+func (h *Handler) SignOut(c *gin.Context) {
 	session.Delete(c)
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-// GETSearch func
-func GETSearch(c *gin.Context, r *registry.Registry) {
+// Search func
+func (h *Handler) Search(c *gin.Context) {
 	id := c.Param("id")
-	uc := user.NewUseCase(r.UserRepository, r.EventRepository)
+	uc := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository)
 	user, events := uc.Search(id)
 	c.JSON(http.StatusOK, gin.H{
 		"user":   user,
@@ -65,11 +77,19 @@ func GETSearch(c *gin.Context, r *registry.Registry) {
 	})
 }
 
-// GETEvent func
-func GETEvent(c *gin.Context, r *registry.Registry) {
+// Upload func
+func (h *Handler) Upload(c *gin.Context) {
+	uc := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository)
+	file, _ := c.FormFile("file")
+	uc.Upload(file.Filename)
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+// GetEvent func
+func (h *Handler) GetEvent(c *gin.Context) {
 	id := session.GetID(c)
-	user := user.NewUseCase(r.UserRepository, r.EventRepository).Get(id)
-	uc := event.NewUseCase(r.EventRepository)
+	user := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository).Get(id)
+	uc := event.NewUseCase(h.registry.EventRepository)
 	dayRestCount, nightRestCount := uc.GetRestCounts()
 
 	c.JSON(http.StatusOK, gin.H{
@@ -80,8 +100,8 @@ func GETEvent(c *gin.Context, r *registry.Registry) {
 	})
 }
 
-// POSTEvent func
-func POSTEvent(c *gin.Context, r *registry.Registry) {
+// CreateEvent func
+func (h *Handler) CreateEvent(c *gin.Context) {
 	var params struct {
 		Category string    `json:"category"`
 		Date     time.Time `json:"date"`
@@ -90,9 +110,9 @@ func POSTEvent(c *gin.Context, r *registry.Registry) {
 		handleError(c, err)
 	} else {
 		id := session.GetID(c)
-		user := user.NewUseCase(r.UserRepository, r.EventRepository).Get(id)
-		uc := event.NewUseCase(r.EventRepository)
-		event, err := uc.AddEvent(user, params.Category, params.Date.In(time.Local))
+		user := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository).Get(id)
+		uc := event.NewUseCase(h.registry.EventRepository)
+		event, err := uc.CreateEvent(user, params.Category, params.Date.In(time.Local))
 		if err != nil {
 			handleError(c, err)
 		} else {
@@ -101,8 +121,8 @@ func POSTEvent(c *gin.Context, r *registry.Registry) {
 	}
 }
 
-// PUTEvent func
-func PUTEvent(c *gin.Context, r *registry.Registry) {
+// DeleteEvent func
+func (h *Handler) DeleteEvent(c *gin.Context) {
 	var params struct {
 		Category string    `json:"category"`
 		Date     time.Time `json:"date"`
@@ -111,7 +131,7 @@ func PUTEvent(c *gin.Context, r *registry.Registry) {
 		handleError(c, err)
 	} else {
 		id := session.GetID(c)
-		uc := event.NewUseCase(r.EventRepository)
+		uc := event.NewUseCase(h.registry.EventRepository)
 		event, err := uc.Delete(id, params.Category, params.Date.In(time.Local))
 		if err != nil {
 			handleError(c, err)

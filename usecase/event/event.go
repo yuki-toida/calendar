@@ -11,12 +11,12 @@ import (
 )
 
 const capacity = 3
-const dayCouples = 4
-const nightCouples = 8
-const dayCategory = "day"
-const nightCategory = "night"
-const dayClass = "text-white bg-danger rounded"
-const nightClass = "text-white bg-success rounded"
+const couplesDay = 4
+const couplesNight = 8
+const categoryDay = "day"
+const categoryNight = "night"
+const classDay = "text-white bg-danger rounded"
+const classNight = "text-white bg-success rounded"
 
 // UseCase type
 type UseCase struct {
@@ -39,10 +39,10 @@ func (u *UseCase) Get(year, month int, id string) *model.Event {
 func (u *UseCase) Gets() []*model.Event {
 	events := u.EventRepository.FindAll()
 	for _, v := range events {
-		if v.Category == dayCategory {
-			v.Classes = dayClass
+		if v.Category == categoryDay {
+			v.Classes = classDay
 		} else {
-			v.Classes = nightClass
+			v.Classes = classNight
 		}
 	}
 	return events
@@ -81,15 +81,15 @@ func (u *UseCase) GetRestCounts() (int, int) {
 	now := time.Now()
 	year := now.Year()
 	month := int(now.Month())
-	days := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, Category: dayCategory}))
-	nights := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, Category: nightCategory}))
-	dayRestCount := dayCouples*capacity - days
-	nightRestCount := nightCouples*capacity - nights
+	days := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, Category: categoryDay}))
+	nights := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, Category: categoryNight}))
+	dayRestCount := couplesDay*capacity - days
+	nightRestCount := couplesNight*capacity - nights
 	return dayRestCount, nightRestCount
 }
 
-// AddEvent func
-func (u *UseCase) AddEvent(user *model.User, category string, date time.Time) (*model.Event, error) {
+// CreateEvent func
+func (u *UseCase) CreateEvent(user *model.User, category string, date time.Time) (*model.Event, error) {
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 	if date.Before(today) {
@@ -109,12 +109,12 @@ func (u *UseCase) AddEvent(user *model.User, category string, date time.Time) (*
 	}
 	categoryCount := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, Category: category}))
 	switch category {
-	case dayCategory:
-		if dayCouples*capacity <= categoryCount {
+	case categoryDay:
+		if couplesDay*capacity <= categoryCount {
 			return nil, errors.New("昼Knowmeはすでに満席です")
 		}
-	case nightCategory:
-		if nightCouples*capacity <= categoryCount {
+	case categoryNight:
+		if couplesNight*capacity <= categoryCount {
 			return nil, errors.New(category + "夜Knowmeはすでに満席です")
 		}
 	}
@@ -124,10 +124,10 @@ func (u *UseCase) AddEvent(user *model.User, category string, date time.Time) (*
 		return nil, errors.New(message + "と既に参加済みです")
 	}
 	var classes string
-	if category == dayCategory {
-		classes = dayClass
+	if category == categoryDay {
+		classes = classDay
 	} else {
-		classes = nightClass
+		classes = classNight
 	}
 	event := &model.Event{
 		Year:      date.Year(),

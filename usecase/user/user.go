@@ -2,11 +2,15 @@ package user
 
 import (
 	"errors"
+	"io/ioutil"
 	"strings"
 
 	"github.com/yuki-toida/knowme/config"
 	"github.com/yuki-toida/knowme/domain/model"
 	"github.com/yuki-toida/knowme/domain/repository"
+
+	"cloud.google.com/go/storage"
+	"golang.org/x/net/context"
 )
 
 // UseCase type
@@ -73,4 +77,30 @@ func (u *UseCase) Search(id string) (*model.User, []*model.UserEvent) {
 		})
 	}
 	return u.Get(id), results
+}
+
+// Upload func
+func (u *UseCase) Upload(file string) error {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	data, err := ioutil.ReadFile(file)
+	if err != nil {
+		return err
+	}
+
+	w := client.Bucket(config.Config.Server.Bucket).Object(file).NewWriter(ctx)
+	defer w.Close()
+
+	if _, err := w.Write(data); err != nil {
+		return err
+	}
+	if err := w.Close(); err != nil {
+		return err
+	}
+	return nil
 }

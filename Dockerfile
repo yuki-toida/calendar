@@ -7,7 +7,8 @@ RUN go get -u github.com/golang/dep/cmd/dep && \
 
 FROM alpine:latest
 EXPOSE 8080
-ENV ENV=dev
+ENV ENV=dev \
+    GOOGLE_APPLICATION_CREDENTIALS="./cred/gcs.json"
 RUN apk update && \
     apk upgrade && \
     apk add --no-cache ca-certificates

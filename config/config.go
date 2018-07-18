@@ -13,8 +13,9 @@ var Config struct {
 	Env    string
 	Domain string
 	Server struct {
-		Host string `toml:"host"`
-		Port string `toml:"port"`
+		Host   string `toml:"host"`
+		Port   string `toml:"port"`
+		Bucket string `toml:"bucket"`
 	}
 	Db struct {
 		Host string `toml:"host"`
@@ -23,8 +24,8 @@ var Config struct {
 	}
 }
 
-// Initialize func
-func Initialize() {
+// Init func
+func Init() {
 	env := os.Getenv("ENV")
 	_, err := toml.DecodeFile("config/"+env+".toml", &Config)
 	if err != nil {

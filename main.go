@@ -17,7 +17,7 @@ import (
 )
 
 func init() {
-	config.Initialize()
+	config.Init()
 }
 
 func main() {
@@ -30,6 +30,7 @@ func main() {
 	db.AutoMigrate(&model.User{}, &model.Event{})
 
 	registry := registry.NewRegistry(user.NewRepository(db), event.NewRepository(db))
+	handler := handler.NewHandler(registry)
 
 	router := gin.Default()
 	session.AddMiddleware(router)
@@ -42,16 +43,17 @@ func main() {
 	router.GET("/healthz", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK")
 	})
-	router.GET("/initial", func(c *gin.Context) { handler.GETInitial(c, registry) })
-	router.POST("/signin", func(c *gin.Context) { handler.POSTSignIn(c, registry) })
-	router.DELETE("/signout", func(c *gin.Context) { handler.DELETESignOut(c, registry) })
-	router.GET("/search/:id", func(c *gin.Context) { handler.GETSearch(c, registry) })
+	router.GET("/initial", func(c *gin.Context) { handler.Initial(c) })
+	router.POST("/signin", func(c *gin.Context) { handler.SignIn(c) })
+	router.DELETE("/signout", func(c *gin.Context) { handler.SignOut(c) })
+	router.GET("/search/:id", func(c *gin.Context) { handler.Search(c) })
+	router.POST("/upload", func(c *gin.Context) { handler.Upload(c) })
 
 	events := router.Group("/events")
 	{
-		events.GET("/", func(c *gin.Context) { handler.GETEvent(c, registry) })
-		events.POST("/", func(c *gin.Context) { handler.POSTEvent(c, registry) })
-		events.PUT("/", func(c *gin.Context) { handler.PUTEvent(c, registry) })
+		events.GET("/", func(c *gin.Context) { handler.GetEvent(c) })
+		events.POST("/", func(c *gin.Context) { handler.CreateEvent(c) })
+		events.PUT("/", func(c *gin.Context) { handler.DeleteEvent(c) })
 	}
 
 	router.Run(":" + config.Config.Server.Port)

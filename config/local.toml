@@ -1,6 +1,7 @@
 [server]
 host = "http://localhost"
 port = "8080"
+bucket = "bucket-knowme-dev"
 
 [db]
 host = "127.0.0.1"

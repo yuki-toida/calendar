@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "planet-pluto-dev",
+  "private_key_id": "a0c40563dc4b0c878c18a09ee1662d0a29383bc6",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDi+WTEAZL5wjqn\nz8zeOb3sNvkx7hGo/D0KH79PJbpYdJcwER0CRSKY7MUmAEKWDJ/HBmsFCmFr0w4o\nL9woy1wQSYUxjgs031I0GtevV63wbe9vKP+bcWM/CiBvCpDqGBMXrFn1BxyII/SZ\nMh4Rga4gZLdJEl76ogAeQoetHqaEduXlpWMrN8yW4FLgUcu7ebRye4oFd7Y35InA\nseNzo4bqEEM8ZxETZPXuGL73fCAQ421p00GhiAUraQ4r1yjP60rLaHvOy3BhgW/O\nZTxpa0NjeWh0k8CQe1Mf3LOfIOnwQvFXuALuZ3zxSIMBpiWZ40IgdQWwnTO7Gxj5\njRbkVUt/AgMBAAECggEAaeRfkiCH4RUwR11n35/Bz0Qgg55lx9iSY7hHCVZ5N06B\nwK+jQI1fpEgGfIGvjxCptHF2mX3r0KHBX5dgl/m0ZHbgeKuj59FuqReC2+/Em0C2\n7b4Lbop6eo0vb47W6Bg+RBOpTms4cP2RXq2moJVHVx6V8jXrcPQGqRdx9B8yIebz\nldzZE47IsU6xTXXfUlukthXXwoSVG9FTScdJ2lP9pgJ1pvB16iPJG0U4Uj7+y7sq\nezcCZVZm3xmzF7Zdm98SmPSUrWtLHXCtsxg93/m3YG/ZFOfEyX4bSt2a+lZpZjhZ\nPVQxfVnLFjGTkVuLrl1ZjMJQWAwHAgxCCbdHFKFzsQKBgQD8gO17J4Znt9sHf4v4\n+LPc+qRuCJNa22prA5YnhDdgHnTgaCiqkdC7crg2xIxmZRaVMRKtyaXGO91d/10c\nnoCHSRWq1CBvMa560z47PhivljMdiMmFVAEZysKjv8r6T/MEVoR/L3oc6BhprGrE\nIKyWac2bT6KOATkNdywTWu0uMQKBgQDmHfgwN6NxZ4SSRdC44g23eEmqh8R0rU7L\naIsSyvb746xm+XN/Sd+n++qeSER4KTtvEdpKCO7OrsUAgryszgxR2WX0itNSux5U\nx4bUn+MDG4L0/4RwYlGeOmO2wxZJ8h/HYWIk0Mm+3Yof2PNZlk75KQOMTVNBX9DB\nLB7e/Zg4rwKBgGTEZwGg8mht3QEPC6MeTVlAxWIMFhJKQhvW4JOAlkDLpsTvjFsV\nugE0dQOWSJmMegir/tJQCNIljeA3SsdjEdPrfLQh15fIceMeblViIKPiAyAkOJf2\nwEG0wxxqK+zc/xSaGmJPZiInFacGYc1HZNjZ/G2gyDR3lHclOfe3b7PhAoGAfMW9\nP++7KI9Xm7RNQyIXC+cmElgBVr5t3e72kZ8JonTFkyQo0tjsc3otsds/fOPmfQfy\nE3iae+jZmrhIs24Z0fuNw7XOdapN/OwfGIUFIzc0n8E4P3OgC6pfTMak/D1Tq9kK\nzSmEaoBXF4OcF3Rfp8vsR5PZ07WvTD6vEnvwoLMCgYEAqEwxTMWseXqLL3qTZgGy\nsd+ICWj2pVHbjW7n1GenHGQjm5EEKRFE77SMG6joH5vrMBWn5YfBhoJhqbXK5R5G\nBNH10fki+x6CLMRWYVvA9OOWusSZlxeei9gBS+fuZvkmtEyXJGEHHNHe81tGRgZz\nv204VPJHdNGTDLCABXp+/vY=\n-----END PRIVATE KEY-----\n",
+  "client_email": "cloud-storage-client@planet-pluto-dev.iam.gserviceaccount.com",
+  "client_id": "100286408673458534815",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cloud-storage-client%40planet-pluto-dev.iam.gserviceaccount.com"
+}
