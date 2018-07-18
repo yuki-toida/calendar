@@ -26,5 +26,8 @@ main
 /assets/dist
 /static
 
+# cred
+/cred
+
 # mysql volume
 /mysql/data/
