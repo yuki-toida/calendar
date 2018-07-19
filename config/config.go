@@ -13,9 +13,10 @@ var Config struct {
 	Env    string
 	Domain string
 	Server struct {
-		Host   string `toml:"host"`
-		Port   string `toml:"port"`
-		Bucket string `toml:"bucket"`
+		Host       string `toml:"host"`
+		Port       string `toml:"port"`
+		Bucket     string `toml:"bucket"`
+		StorageURL string `toml:"storage-url"`
 	}
 	Db struct {
 		Host string `toml:"host"`

@@ -3,6 +3,7 @@ package user
 import (
 	"errors"
 	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/yuki-toida/knowme/config"
@@ -80,7 +81,7 @@ func (u *UseCase) Search(id string) (*model.User, []*model.UserEvent) {
 }
 
 // Upload func
-func (u *UseCase) Upload(file string) error {
+func (u *UseCase) Upload(fileName string) error {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	if err != nil {
@@ -88,12 +89,12 @@ func (u *UseCase) Upload(file string) error {
 	}
 	defer client.Close()
 
-	data, err := ioutil.ReadFile(file)
+	data, err := ioutil.ReadFile(fileName)
 	if err != nil {
 		return err
 	}
 
-	w := client.Bucket(config.Config.Server.Bucket).Object(file).NewWriter(ctx)
+	w := client.Bucket(config.Config.Server.Bucket).Object(fileName).NewWriter(ctx)
 	defer w.Close()
 
 	if _, err := w.Write(data); err != nil {
@@ -102,5 +103,9 @@ func (u *UseCase) Upload(file string) error {
 	if err := w.Close(); err != nil {
 		return err
 	}
+	if err := os.Remove(fileName); err != nil {
+		panic(err)
+	}
+
 	return nil
 }

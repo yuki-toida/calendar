@@ -22,6 +22,9 @@ function createStore(data) {
     strict: false,
     state: {
       domain: data.domain,
+      storageUrl: data.storageUrl,
+      couplesDay: data.couplesDay,
+      couplesNight: data.couplesNight,
       user: data.user,
     },
     getters: {

@@ -2,6 +2,7 @@
 host = "https://knowme.theliveup.tv"
 port = "8080"
 bucket = "bucket-knowme-dev"
+storage-url = "https://storage.googleapis.com"
 
 [db]
 host = "127.0.0.1"

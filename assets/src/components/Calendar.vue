@@ -2,15 +2,27 @@
   <div>
     <img src="/static/img/header.jpg" alt="" class="img-thumbnail">
     <div class="row my-2">
-      <div class="col-sm-6">
-        <p>
+      <div class="col">
+        <div class="my-2">
           <badge-day/><span class="ml-3">{{ thisMonth }} 残席 {{ dayRestCount }}</span>
-        </p>
-        <p>
+        </div>
+        <div class="my-2">
           <badge-night/><span class="ml-3">{{ thisMonth }} 残席 {{ nightRestCount }}</span>
-        </p>
+        </div>
+        <div v-if="uploadText" class="mt-2">
+          <div class="font-weight-bold">{{ uploadText }}</div>
+          <div class="input-group">
+            <div class="custom-file">
+              <input v-on:change="changeFile" type="file" class="custom-file-input" id="customFile" lang="ja" accept="image/*" required="">
+              <label class="custom-file-label" for="customFile">ファイル選択...</label>
+            </div>
+            <div class="input-group-append">
+              <button v-on:click="upload" type="button" class="btn btn-outline-secondary">アップロード</button>
+            </div>          
+          </div>
+        </div>
       </div>
-      <div class="col-sm-6">
+      <div class="col">
         <div v-if="event" class="card">
           <div class="card-body">
             <p class="card-text">
@@ -26,6 +38,17 @@
             <button type="button" class="btn btn-outline-dark btn-sm" v-on:click="leave">参加を取り消す</button>
           </div>
         </div>
+      </div>
+    </div>
+    <div class="row my-3">
+      <div class="col">
+        <img src="/static/img/header.jpg" width="100" height="100">
+        <img src="/static/img/header.jpg" width="100" height="100">
+        <img src="/static/img/header.jpg" width="100" height="100">
+        <img src="/static/img/header.jpg" width="100" height="100">
+        <img src="/static/img/header.jpg" width="100" height="100">
+        <img src="/static/img/header.jpg" width="100" height="100">
+        <img src="/static/img/header.jpg" width="100" height="100">
       </div>
     </div>
     <simple-calendar
@@ -66,6 +89,8 @@ export default {
       nightRestCount: null,
       showModal: false,
       targetDate: null,
+      uploadText: '7月21日の画像がアップロードされていません',
+      uploadFile: null,
     }
   },
   created: function() {
@@ -115,6 +140,32 @@ export default {
       const id = event.id.split(':').pop();
       this.$router.push({ name: 'Search', params: { id: id } });
     },
+    changeFile(e) {
+      e.preventDefault();
+      this.uploadFile = e.target.files[0];
+    },
+    upload(e) {
+      let formData = new FormData();
+      formData.append('file', this.uploadFile);
+      http.post('/upload', formData)
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((error) => this.$toasted.show(error));
+    },
   }
 }
 </script>
+
+<style>
+.custom-file-input:lang(ja) ~ .custom-file-label::after {
+  content: "選択";
+}
+.custom-file {
+  max-width: 20rem;
+  overflow: hidden;
+}
+.custom-file-label {
+  white-space: nowrap;
+}
+</style>

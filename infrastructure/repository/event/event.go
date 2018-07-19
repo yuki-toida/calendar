@@ -17,9 +17,9 @@ func NewRepository(db *gorm.DB) repository.Event {
 	}
 }
 
-func (r *repositoryImpl) First(year, month int, id string) *model.Event {
+func (r *repositoryImpl) First(year, month, day int, category, id string) *model.Event {
 	result := model.Event{}
-	r.db.Where(&model.Event{Year: year, Month: month, ID: id}).First(&result)
+	r.db.Where(&model.Event{Year: year, Month: month, Day: day, Category: category, ID: id}).First(&result)
 	if result == (model.Event{}) {
 		return nil
 	}

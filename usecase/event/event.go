@@ -10,9 +10,13 @@ import (
 	"github.com/yuki-toida/knowme/domain/repository"
 )
 
+// CouplesDay const
+const CouplesDay = 4
+
+// CouplesNight const
+const CouplesNight = 8
+
 const capacity = 3
-const couplesDay = 4
-const couplesNight = 8
 const categoryDay = "day"
 const categoryNight = "night"
 const classDay = "text-white bg-danger rounded"
@@ -31,8 +35,8 @@ func NewUseCase(u repository.Event) *UseCase {
 }
 
 // Get func
-func (u *UseCase) Get(year, month int, id string) *model.Event {
-	return u.EventRepository.First(year, month, id)
+func (u *UseCase) Get(year, month, day int, category string, id string) *model.Event {
+	return u.EventRepository.First(year, month, day, category, id)
 }
 
 // Gets func
@@ -57,13 +61,13 @@ func (u *UseCase) GetUserEvent(user *model.User) *model.UserEvent {
 	year := now.Year()
 	month := int(now.Month())
 
-	event := u.Get(year, month, user.ID)
-	if event == nil {
+	events := u.EventRepository.Find(&model.Event{Year: year, Month: month, ID: user.ID})
+	if len(events) <= 0 {
 		return nil
 	}
-	events := u.EventRepository.Find(&model.Event{StartDate: event.StartDate, Category: event.Category})
+	event := events[0]
 	titles := []string{}
-	for _, v := range events {
+	for _, v := range u.EventRepository.Find(&model.Event{StartDate: event.StartDate, Category: event.Category}) {
 		if v.StartDate == event.StartDate && v.Category == event.Category {
 			titles = append(titles, v.Title)
 		}
@@ -83,8 +87,8 @@ func (u *UseCase) GetRestCounts() (int, int) {
 	month := int(now.Month())
 	days := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, Category: categoryDay}))
 	nights := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, Category: categoryNight}))
-	dayRestCount := couplesDay*capacity - days
-	nightRestCount := couplesNight*capacity - nights
+	dayRestCount := CouplesDay*capacity - days
+	nightRestCount := CouplesNight*capacity - nights
 	return dayRestCount, nightRestCount
 }
 
@@ -97,10 +101,11 @@ func (u *UseCase) CreateEvent(user *model.User, category string, date time.Time)
 	}
 	year := date.Year()
 	month := int(date.Month())
+	day := date.Day()
 	if today.Year() < year || int(today.Month()) < month {
 		return nil, errors.New("未来の登録は出来ません")
 	}
-	if u.Get(year, month, user.ID) != nil {
+	if u.Get(year, month, day, category, user.ID) != nil {
 		return nil, errors.New("今月は既に登録済みです")
 	}
 	dateCount := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, StartDate: date, Category: category}))
@@ -110,11 +115,11 @@ func (u *UseCase) CreateEvent(user *model.User, category string, date time.Time)
 	categoryCount := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, Category: category}))
 	switch category {
 	case categoryDay:
-		if couplesDay*capacity <= categoryCount {
+		if CouplesDay*capacity <= categoryCount {
 			return nil, errors.New("昼Knowmeはすでに満席です")
 		}
 	case categoryNight:
-		if couplesNight*capacity <= categoryCount {
+		if CouplesNight*capacity <= categoryCount {
 			return nil, errors.New(category + "夜Knowmeはすでに満席です")
 		}
 	}
@@ -132,12 +137,13 @@ func (u *UseCase) CreateEvent(user *model.User, category string, date time.Time)
 	event := &model.Event{
 		Year:      date.Year(),
 		Month:     int(date.Month()),
+		Day:       date.Day(),
+		Category:  category,
 		ID:        user.ID,
 		EventID:   date.Format("2006-01-02") + ":" + user.ID,
 		Title:     user.Name,
 		StartDate: date,
 		EndDate:   date,
-		Category:  category,
 		Classes:   classes,
 	}
 	u.EventRepository.Create(event)
@@ -179,9 +185,7 @@ func (u *UseCase) duplicateIds(year, month int, date time.Time, category, id str
 
 // Delete func
 func (u *UseCase) Delete(id, category string, date time.Time) (*model.Event, error) {
-	year := date.Year()
-	month := int(date.Month())
-	event := u.Get(year, month, id)
+	event := u.Get(date.Year(), int(date.Month()), date.Day(), category, id)
 	if event == nil {
 		return nil, errors.New("参加していません")
 	}

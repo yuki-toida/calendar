@@ -34,8 +34,11 @@ func (h *Handler) Initial(c *gin.Context) {
 	uc := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository)
 	user := uc.Get(id)
 	c.JSON(http.StatusOK, gin.H{
-		"domain": config.Config.Domain,
-		"user":   user,
+		"domain":       config.Config.Domain,
+		"storageUrl":   config.Config.Server.StorageURL,
+		"couplesDay":   event.CouplesDay,
+		"couplesNight": event.CouplesNight,
+		"user":         user,
 	})
 }
 
@@ -81,8 +84,13 @@ func (h *Handler) Search(c *gin.Context) {
 func (h *Handler) Upload(c *gin.Context) {
 	uc := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository)
 	file, _ := c.FormFile("file")
-	uc.Upload(file.Filename)
-	c.JSON(http.StatusOK, gin.H{})
+	c.SaveUploadedFile(file, file.Filename)
+	err := uc.Upload(file.Filename)
+	if err != nil {
+		handleError(c, err)
+	} else {
+		c.JSON(http.StatusOK, gin.H{})
+	}
 }
 
 // GetEvent func

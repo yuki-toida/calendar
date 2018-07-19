@@ -11,7 +11,7 @@ type User interface {
 
 // Event type
 type Event interface {
-	First(int, int, string) *model.Event
+	First(int, int, int, string, string) *model.Event
 	FindAll() []*model.Event
 	Find(interface{}) []*model.Event
 	Create(*model.Event)

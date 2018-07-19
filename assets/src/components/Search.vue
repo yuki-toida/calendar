@@ -1,8 +1,5 @@
 <template>
   <div>
-    <!-- <img v-bind:src="user.photo" class="rounded" width="auto" height="50">
-    {{ user.name }}
-    {{ user.id }} -->
     <div class="row my-2">
       <div class="col-sm-4">
         <div class="input-group">
