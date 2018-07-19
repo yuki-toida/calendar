@@ -42,6 +42,10 @@ func (r *repositoryImpl) Create(u *model.Event) {
 	r.db.Create(u)
 }
 
+func (r *repositoryImpl) Update(u *model.Event) {
+	r.db.Save(u)
+}
+
 func (r *repositoryImpl) Delete(u *model.Event) {
 	r.db.Delete(u)
 }

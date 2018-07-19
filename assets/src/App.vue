@@ -7,8 +7,13 @@
       </router-link>
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
+          <router-link class="nav-link" v-bind:to="{ name: 'Images' }">
+            画像一覧
+          </router-link>
+        </li>
+        <li class="nav-item">
           <router-link class="nav-link" v-if="$store.getters.isSignIn" v-bind:to="{ name: 'Search', params: { id: $store.state.user.id } }">
-            履歴
+            参加履歴
           </router-link>
         </li>
       </ul>

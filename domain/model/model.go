@@ -31,12 +31,8 @@ type Event struct {
 	Title     string    `gorm:"not null" json:"title"`
 	StartDate time.Time `gorm:"type:date;not null" json:"startDate"`
 	EndDate   time.Time `gorm:"type:date;not null" json:"endDate"`
-	IsUpload  bool      `gorm:"not null" json:"isUpload"`
+	Ext       string    `gorm:"not null" json:"Ext"`
 	Classes   string    `gorm:"-" json:"classes"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
-}
-
-// Image struct
-type Image struct {
 }

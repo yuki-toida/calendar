@@ -15,5 +15,6 @@ type Event interface {
 	FindAll() []*model.Event
 	Find(interface{}) []*model.Event
 	Create(*model.Event)
+	Update(*model.Event)
 	Delete(*model.Event)
 }

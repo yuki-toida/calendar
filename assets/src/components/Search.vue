@@ -29,7 +29,7 @@
         </tr>
       </tbody>
     </table>
-    <div v-else class="text-secondary">
+    <div v-else class="text-secondary ml-3 mt-3">
       参加履歴がありません<br/>
       {{ $route.params.id }} さんを誘ってみましょう
     </div>

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -35,7 +36,6 @@ func (h *Handler) Initial(c *gin.Context) {
 	user := uc.Get(id)
 	c.JSON(http.StatusOK, gin.H{
 		"domain":       config.Config.Domain,
-		"storageUrl":   config.Config.Server.StorageURL,
 		"couplesDay":   event.CouplesDay,
 		"couplesNight": event.CouplesNight,
 		"user":         user,
@@ -80,12 +80,26 @@ func (h *Handler) Search(c *gin.Context) {
 	})
 }
 
+// Images func
+func (h *Handler) Images(c *gin.Context) {
+	uc := event.NewUseCase(h.registry.EventRepository)
+	c.JSON(http.StatusOK, gin.H{
+		"images": uc.GetImages(),
+	})
+}
+
 // Upload func
 func (h *Handler) Upload(c *gin.Context) {
-	uc := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository)
+	id := session.GetID(c)
+	uc := event.NewUseCase(h.registry.EventRepository)
+	year, _ := strconv.Atoi(c.PostForm("year"))
+	month, _ := strconv.Atoi(c.PostForm("month"))
+	day, _ := strconv.Atoi(c.PostForm("day"))
+	category := c.PostForm("category")
 	file, _ := c.FormFile("file")
+
 	c.SaveUploadedFile(file, file.Filename)
-	err := uc.Upload(file.Filename)
+	err := uc.Upload(year, month, day, category, id, file.Filename)
 	if err != nil {
 		handleError(c, err)
 	} else {
@@ -105,6 +119,7 @@ func (h *Handler) GetEvent(c *gin.Context) {
 		"event":          uc.GetUserEvent(user),
 		"dayRestCount":   dayRestCount,
 		"nightRestCount": nightRestCount,
+		"images":         uc.GetImages(),
 	})
 }
 

@@ -1,11 +1,17 @@
 package event
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
+	"cloud.google.com/go/storage"
+	"github.com/yuki-toida/knowme/config"
 	"github.com/yuki-toida/knowme/domain/model"
 	"github.com/yuki-toida/knowme/domain/repository"
 )
@@ -90,6 +96,26 @@ func (u *UseCase) GetRestCounts() (int, int) {
 	dayRestCount := CouplesDay*capacity - days
 	nightRestCount := CouplesNight*capacity - nights
 	return dayRestCount, nightRestCount
+}
+
+// GetImages func
+func (u *UseCase) GetImages() []string {
+	now := time.Now()
+	year := now.Year()
+	month := int(now.Month())
+
+	events := u.EventRepository.Find(&model.Event{Year: year, Month: month})
+	rootPath := config.Config.Server.StorageURL + "/" + config.Config.Server.Bucket
+	fmt.Println(rootPath)
+	results := []string{}
+	for _, v := range events {
+		if v.Ext != "" {
+			url := rootPath + fmt.Sprintf("/%d/%d/%d/", year, month, v.Day) + v.Category + v.Ext
+			results = append(results, url)
+		}
+	}
+	fmt.Println(results)
+	return results
 }
 
 // CreateEvent func
@@ -178,8 +204,6 @@ func (u *UseCase) duplicateIds(year, month int, date time.Time, category, id str
 			}
 		}
 	}
-	fmt.Println(duplicateIds)
-	fmt.Println(results)
 	return results
 }
 
@@ -191,4 +215,49 @@ func (u *UseCase) Delete(id, category string, date time.Time) (*model.Event, err
 	}
 	u.EventRepository.Delete(event)
 	return event, nil
+}
+
+// Upload func
+func (u *UseCase) Upload(year, month, day int, category, id, fileName string) error {
+	event := u.Get(year, month, day, category, id)
+	if event == nil {
+		return errors.New("パラメータが不正です")
+	}
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	data, err := ioutil.ReadFile(fileName)
+	if err != nil {
+		return err
+	}
+
+	ext := filepath.Ext(fileName)
+	path := fmt.Sprintf("%d/%d/%d/", year, month, day) + category + ext
+	w := client.Bucket(config.Config.Server.Bucket).Object(path).NewWriter(ctx)
+	defer w.Close()
+
+	if _, err := w.Write(data); err != nil {
+		return err
+	}
+	if err := w.Close(); err != nil {
+		return err
+	}
+	if err := os.Remove(fileName); err != nil {
+		panic(err)
+	}
+	event.Ext = ext
+	u.EventRepository.Update(event)
+
+	for _, v := range u.EventRepository.Find(&model.Event{Year: year, Month: month, Day: day, Category: category}) {
+		if v.ID != id {
+			v.Ext = ""
+			u.EventRepository.Update(v)
+		}
+	}
+
+	return nil
 }
