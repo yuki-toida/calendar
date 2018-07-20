@@ -22,7 +22,7 @@
             </label>
           </div>
         </div>
-        <div class="modal-footer">            
+        <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" v-bind:class="{ disabled: category == null }" v-on:click="join">参加する</button>
         </div>
       </div>
@@ -34,7 +34,6 @@
 import http from '../http';
 import BadgeDay from './BadgeDay.vue'
 import BadgeNight from './BadgeNight.vue'
-import { functions } from 'firebase';
 
 export default {
   name: 'Modal',
@@ -49,7 +48,7 @@ export default {
     }
   },
   mounted: function() {
-    this.show();
+    this.$emit('show', false);
   },
   computed: {
     title: function() {
@@ -57,9 +56,6 @@ export default {
     }
   },
   methods: {
-    show() {
-      $('#modal').modal('show');
-    },
     hide() {
       $('#modal').modal('hide');
       this.category = null;

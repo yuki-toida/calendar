@@ -51,7 +51,7 @@
       v-on:click-date="clickDate"
       v-on:click-event="clickEvent"
     />
-    <modal v-if="showModal" v-bind:date="targetDate" v-on:join="fetch" v-on:hide="showModal = false"/>
+    <modal v-if="modal" v-bind:date="targetDate" v-on:join="fetch" v-on:show="showModal" v-on:hide="modal = false"/>
   </div>
 </template>
 
@@ -61,7 +61,6 @@ import Modal from './Modal.vue'
 import BadgeDay from './BadgeDay.vue'
 import BadgeNight from './BadgeNight.vue'
 import http from '../http';
-import { functions } from 'firebase';
 
 export default {
   name: 'Calendar',
@@ -79,7 +78,7 @@ export default {
       event: null,
       dayRestCount: null,
       nightRestCount: null,
-      showModal: false,
+      modal: false,
       targetDate: null,
       images: [],
     }
@@ -120,7 +119,8 @@ export default {
     clickDate(date) {
       if (this.$store.getters.isSignIn) {
         this.targetDate = date;
-        this.showModal = true;
+        this.modal = true;
+        this.showModal();
       } else {
         this.$toasted.show("サインインしてください");
       }
@@ -129,6 +129,9 @@ export default {
       const id = event.id.split(':').pop();
       this.$router.push({ name: 'Search', params: { id: id } });
     },
+    showModal() {
+      $('#modal').modal('show');
+    }
   }
 }
 </script>
@@ -143,5 +146,8 @@ export default {
 }
 .custom-file-label {
   white-space: nowrap;
+}
+.cv-weeks {
+  cursor: pointer;
 }
 </style>

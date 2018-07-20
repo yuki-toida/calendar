@@ -165,11 +165,10 @@ func (u *UseCase) CreateEvent(user *model.User, category string, date time.Time)
 	}
 	year := date.Year()
 	month := int(date.Month())
-	day := date.Day()
 	if today.Year() < year || int(today.Month()) < month {
 		return nil, errors.New("未来の登録は出来ません")
 	}
-	if u.Get(year, month, day, category, user.ID) != nil {
+	if 0 < len(u.EventRepository.Find(&model.Event{Year: year, Month: month, ID: user.ID})) {
 		return nil, errors.New("今月は既に登録済みです")
 	}
 	dateCount := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, StartDate: date, Category: category}))

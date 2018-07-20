@@ -8,12 +8,12 @@
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
           <router-link class="nav-link" v-bind:to="{ name: 'Images' }">
-            飲み画像
+            写真
           </router-link>
         </li>
         <li class="nav-item">
           <router-link class="nav-link" v-if="$store.getters.isSignIn" v-bind:to="{ name: 'Search', params: { id: $store.state.user.id } }">
-            飲み履歴
+            履歴
           </router-link>
         </li>
       </ul>
@@ -28,6 +28,9 @@
       </ul>
     </nav>
     <router-view></router-view>
+    <footer class="py-5">
+      <p class="small text-right text-secondary">Copyright © Candee. All Rights Reserved.</p>
+    </footer>
   </div>
 </template>
 

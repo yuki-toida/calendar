@@ -12,7 +12,7 @@ module.exports = (_, argv) => ({
       ? path.resolve(__dirname, '../static/js')
       : path.resolve(__dirname, './dist/js')
   },
-  devtool: 'source-map',
+  // devtool: 'source-map',
   module: {
     rules: [
       {
