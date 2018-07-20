@@ -27,10 +27,6 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 120
         env:
-        - name: POD_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.podIP
         - name: DB_HOST
           value: "127.0.0.1"
         - name: DB_PORT
@@ -47,7 +43,7 @@ spec:
               key: password
       - name: cloudsql-proxy
         image: gcr.io/cloudsql-docker/gce-proxy:1.11
-        command: 
+        command:
         - "/cloud_sql_proxy"
         - "--dir=/cloudsql"
         - "-instances=planet-pluto-dev:asia-northeast1:mysql-dev=tcp:3306"

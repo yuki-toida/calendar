@@ -86,6 +86,27 @@ func (u *UseCase) GetUserEvent(user *model.User) *model.UserEvent {
 	}
 }
 
+// GetUserEvents func
+func (u *UseCase) GetUserEvents(user *model.User) []*model.UserEvent {
+	results := []*model.UserEvent{}
+	if user == nil {
+		return results
+	}
+	events := u.EventRepository.Find(&model.Event{ID: user.ID})
+	if len(events) <= 0 {
+		return results
+	}
+	for _, v := range events {
+		date := time.Date(v.Year, time.Month(v.Month), v.Day, 0, 0, 0, 0, time.Local)
+		results = append(results, &model.UserEvent{
+			Date:     date,
+			Category: v.Category,
+			Titles:   []string{},
+		})
+	}
+	return results
+}
+
 // GetRestCounts func
 func (u *UseCase) GetRestCounts() (int, int) {
 	now := time.Now()
@@ -106,7 +127,6 @@ func (u *UseCase) GetImages() []string {
 
 	events := u.EventRepository.Find(&model.Event{Year: year, Month: month})
 	rootPath := config.Config.Server.StorageURL + "/" + config.Config.Server.Bucket
-	fmt.Println(rootPath)
 	results := []string{}
 	for _, v := range events {
 		if v.Ext != "" {
@@ -114,8 +134,26 @@ func (u *UseCase) GetImages() []string {
 			results = append(results, url)
 		}
 	}
-	fmt.Println(results)
 	return results
+}
+
+// GetAllImages func
+func (u *UseCase) GetAllImages() map[time.Time][]string {
+	events := u.EventRepository.FindAll()
+	rootPath := config.Config.Server.StorageURL + "/" + config.Config.Server.Bucket
+	dict := map[time.Time][]string{}
+	for _, v := range events {
+		if v.Ext != "" {
+			url := rootPath + fmt.Sprintf("/%d/%d/%d/", v.Year, v.Month, v.Day) + v.Category + v.Ext
+			date := time.Date(v.Year, time.Month(v.Month), 1, 0, 0, 0, 0, time.Local)
+			if val, ok := dict[date]; ok {
+				dict[date] = append(val, url)
+			} else {
+				dict[date] = []string{url}
+			}
+		}
+	}
+	return dict
 }
 
 // CreateEvent func

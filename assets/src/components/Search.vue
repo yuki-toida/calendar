@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="row my-2">
+    <div class="row mb-2">
       <div class="col-sm-4">
         <div class="input-group">
           <input type="text" class="form-control" v-model="email" placeholder="example" aria-describedby="addon">

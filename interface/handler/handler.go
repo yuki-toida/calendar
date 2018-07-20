@@ -82,9 +82,12 @@ func (h *Handler) Search(c *gin.Context) {
 
 // Images func
 func (h *Handler) Images(c *gin.Context) {
+	id := session.GetID(c)
+	user := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository).Get(id)
 	uc := event.NewUseCase(h.registry.EventRepository)
 	c.JSON(http.StatusOK, gin.H{
-		"images": uc.GetImages(),
+		"images": uc.GetAllImages(),
+		"events": uc.GetUserEvents(user),
 	})
 }
 
