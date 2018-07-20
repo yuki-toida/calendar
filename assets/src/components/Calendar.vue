@@ -147,7 +147,14 @@ export default {
 .custom-file-label {
   white-space: nowrap;
 }
+.cv-header-days {
+  background-color: #aaa;
+  color: white
+}
 .cv-weeks {
   cursor: pointer;
+}
+.cv-day.past, .cv-day.outsideOfMonth {
+  background-color: #fafafa;
 }
 </style>
