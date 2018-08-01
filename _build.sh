@@ -18,7 +18,7 @@ REGISTRY=asia.gcr.io/planet-pluto-$ENV
 IMAGE=knowme-$ENV
 
 # build and push latest
-gcloud container builds submit --config=_cloudbuild-${ENV}.yaml .
+gcloud builds submit --config=_cloudbuild-${ENV}.yaml .
 
 # delete untag
 digest=`gcloud container images list-tags $REGISTRY/$IMAGE --filter='-tags:*' --format='get(digest)'`

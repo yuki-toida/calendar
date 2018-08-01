@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -35,10 +37,14 @@ func main() {
 	router := gin.Default()
 	session.AddMiddleware(router)
 	router.StaticFS("/static", http.Dir("static"))
-	router.LoadHTMLFiles("index.html")
+	router.LoadHTMLGlob("interface/template/*")
 
 	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", gin.H{})
+		now := time.Now()
+		revision := fmt.Sprintf("%d%d%d%d%d", now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute())
+		c.HTML(http.StatusOK, "index.html", gin.H{
+			"revision": revision,
+		})
 	})
 	router.GET("/healthz", func(c *gin.Context) {
 		c.String(http.StatusOK, "OK")

@@ -1,3 +1,4 @@
+{{ define "index.html" }}
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -8,6 +9,11 @@
 </head>
 <body>
   <div id="app"></div>
-  <script type="text/javascript" src="/static/js/app.js"></script>
+  <script>
+    var script = document.createElement('script');
+    script.setAttribute('src', '/static/js/app.js?v={{ .revision }}');
+    document.head.appendChild(script);
+  </script>
 </body>
 </html>
+{{ end }}
