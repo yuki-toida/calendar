@@ -25,7 +25,7 @@
         <dl v-for="key in Object.keys(images)" v-bind:key="key" class="mb-3">
           <dt>{{ format(key) }}</dt>
           <dd v-for="image in images[key]" v-bind:key="image" class="d-inline">
-            <img v-bind:src="image" height="200" width="auto">
+            <img v-bind:src="image" height="240" width="auto">
           </dd>
         </dl>
       </div>

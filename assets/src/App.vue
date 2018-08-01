@@ -3,7 +3,7 @@
     <nav class="navbar navbar-expand-md navbar-light">
       <router-link class="navbar-brand" v-bind:to="{ name: 'Calendar' }">
         <img v-bind:src="'/static/img/logo.jpg'" width="30" height="auto" class="d-inline-block align-top" alt="">
-        Knowmeカレンダー<span class="text-muted">（β版)</span>
+        Knowmeカレンダー
       </router-link>
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
