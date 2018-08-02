@@ -34,10 +34,10 @@
         <div class="border border-bottom-0 py-3">
           <div class="ml-3 d-flex">
             <div>
-              <badge-day/><span class="ml-1">残り{{ dayRestCount }}人</span>
+              <badge-day/><span class="ml-1">残り{{ dayRestCouples }}組</span>
             </div>
             <div class="ml-4">
-              <badge-night/><span class="ml-1">残り{{ nightRestCount }}人</span>
+              <badge-night/><span class="ml-1">残り{{ nightRestCouples }}組</span>
             </div>
           </div>
         </div>
@@ -76,8 +76,8 @@ export default {
       showDate: new Date(),
       events: [],
       event: null,
-      dayRestCount: null,
-      nightRestCount: null,
+      dayRestCouples: null,
+      nightRestCouples: null,
       modal: false,
       targetDate: null,
       images: [],
@@ -98,8 +98,8 @@ export default {
         .then((data) => {
           this.events = data.events;
           this.event = data.event;
-          this.dayRestCount = data.dayRestCount;
-          this.nightRestCount = data.nightRestCount;
+          this.dayRestCouples = data.dayRestCouples;
+          this.nightRestCouples = data.nightRestCouples;
           this.images = data.images;
         })
         .catch((error) => this.$toasted.show(error));

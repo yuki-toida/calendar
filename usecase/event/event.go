@@ -20,7 +20,7 @@ import (
 const CouplesDay = 4
 
 // CouplesNight const
-const CouplesNight = 8
+const CouplesNight = 9
 
 const capacity = 3
 const categoryDay = "day"
@@ -107,16 +107,34 @@ func (u *UseCase) GetUserEvents(user *model.User) []*model.UserEvent {
 	return results
 }
 
-// GetRestCounts func
-func (u *UseCase) GetRestCounts() (int, int) {
+// GetRestCouples func
+func (u *UseCase) GetRestCouples() (int, int) {
 	now := time.Now()
 	year := now.Year()
 	month := int(now.Month())
-	days := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, Category: categoryDay}))
-	nights := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, Category: categoryNight}))
-	dayRestCount := CouplesDay*capacity - days
-	nightRestCount := CouplesNight*capacity - nights
-	return dayRestCount, nightRestCount
+	dayRestCouples := CouplesDay - countCouples(u.EventRepository, year, month, categoryDay)
+	nightRestCouples := CouplesNight - countCouples(u.EventRepository, year, month, categoryNight)
+	return dayRestCouples, nightRestCouples
+}
+
+func countCouples(repository repository.Event, year, month int, category string) int {
+	events := repository.Find(&model.Event{Year: year, Month: month, Category: category})
+	eventMap := map[int][]string{}
+	for _, v := range events {
+		if val, ok := eventMap[v.Day]; ok {
+			eventMap[v.Day] = append(val, v.ID)
+		} else {
+			eventMap[v.Day] = []string{v.ID}
+		}
+	}
+
+	result := 0
+	for _, v := range eventMap {
+		if capacity <= len(v) {
+			result++
+		}
+	}
+	return result
 }
 
 // GetImages func

@@ -115,14 +115,14 @@ func (h *Handler) GetEvent(c *gin.Context) {
 	id := session.GetID(c)
 	user := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository).Get(id)
 	uc := event.NewUseCase(h.registry.EventRepository)
-	dayRestCount, nightRestCount := uc.GetRestCounts()
+	dayRestCouples, nightRestCouples := uc.GetRestCouples()
 
 	c.JSON(http.StatusOK, gin.H{
-		"events":         uc.Gets(),
-		"event":          uc.GetUserEvent(user),
-		"dayRestCount":   dayRestCount,
-		"nightRestCount": nightRestCount,
-		"images":         uc.GetImages(),
+		"events":           uc.Gets(),
+		"event":            uc.GetUserEvent(user),
+		"dayRestCouples":   dayRestCouples,
+		"nightRestCouples": nightRestCouples,
+		"images":           uc.GetImages(),
 	})
 }
 

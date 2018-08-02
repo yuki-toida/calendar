@@ -18,7 +18,7 @@
         </li>
         <li class="nav-item">
           <router-link class="nav-link" v-bind:to="{ name: 'Help' }">
-            ヘルプ
+            ルール
           </router-link>
         </li>
       </ul>
