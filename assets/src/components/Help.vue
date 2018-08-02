@@ -3,13 +3,13 @@
     <div class="pb-4">
       <h2 class="h6 text-black-50 font-weight-bold">■ Knowmeとは</h2>
       <p>
-        社内のコミュニケーション活性化を目指して、社員同士の食事会の料金の一部を補助する社内制度です。
+        社内のコミュニケーション活性化を目指して、社員同士の食事会の料金の一部を補助する福利厚生制度です。
       </p>
     </div>
 
     <div class="pb-4">
       <h2 class="h6 text-black-50 font-weight-bold">■ 対象者</h2>
-      <p>@candee.co.jpを持つ全社員</p>
+      <p>正/契約/出向/派遣/アルバイト/インターン含む全社員</p>
     </div>
 
     <div class="pb-4">
