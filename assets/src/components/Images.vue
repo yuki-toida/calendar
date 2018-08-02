@@ -35,15 +35,9 @@
 
 <script>
 import http from '../http';
-import BadgeDay from './BadgeDay.vue'
-import BadgeNight from './BadgeNight.vue'
 
 export default {
   name: 'Images',
-  components: {
-    'badge-day': BadgeDay,
-    'badge-night': BadgeNight,
-  },
   data: function() {
     return {
       images: {},      

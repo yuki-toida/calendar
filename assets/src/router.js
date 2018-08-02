@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Calendar from './components/Calendar.vue';
 import Search from './components/Search.vue';
 import Images from './components/Images.vue';
+import Help from './components/Help.vue';
 
 Vue.use(Router);
 
@@ -22,6 +23,11 @@ export default new Router({
       path: '/images',
       name: 'Images',
       component: Images,
+    },
+    {
+      path: '/help',
+      name: 'Help',
+      component: Help,
     },
   ],
 });

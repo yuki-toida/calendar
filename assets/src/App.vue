@@ -16,6 +16,11 @@
             履歴
           </router-link>
         </li>
+        <li class="nav-item">
+          <router-link class="nav-link" v-bind:to="{ name: 'Help' }">
+            ヘルプ
+          </router-link>
+        </li>
       </ul>
       <ul class="navbar-nav">
         <li v-if="$store.getters.isSignIn" class="nav-item">
