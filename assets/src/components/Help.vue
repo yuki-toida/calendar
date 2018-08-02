@@ -16,14 +16,17 @@
       <h2 class="h6 text-black-50 font-weight-bold">■ ルール</h2>
       <ul>
         <li>@candee.co.jpでサインインしてください</li>
-        <li>3人1組(2部署以上必須、4人以上NG)で行ってください</li>
+        <li>2部署以上、3人1組(4人以上NG)で登録してください</li>
         <li>1人あたり月1回まで利用可能です</li>
-        <li>1度でも一緒に行った方とは再度行けません</li>
-        <li>同日に昼夜1組づつ利用可能です</li>
+        <li>1度一緒に行った方とは再度行けません</li>
+        <li>同日に昼夜1組づつ登録可能です</li>
+        <li>毎月先着で、昼Knowme4組 / 夜Knowme9組です</li>
         <li>
           <strong style="text-decoration: underline;">
-            開催後、翌営業日に3人が写っている楽しい写真をアップロードすること♪
+            開催後、翌営業日に3人が写っている楽しい写真をアップロードしてください♪
           </strong>
+          <br>
+          写真ページから日付を指定しアップロード可能です
         </li>
       </ul>
     </div>
@@ -31,15 +34,15 @@
     <div class="pb-4">
       <h2 class="h6 text-black-50 font-weight-bold">■ 補助内容</h2>
       <dl>
-        <dt><badge-day/></dt><dd>1620円(税込)/名[毎月先着4組]</dd>
-        <dt><badge-night/></dt><dd>3240円(税込)/名[毎月先着9組]</dd>
+        <dt><badge-day/></dt><dd>1620円(税込)/名</dd>
+        <dt><badge-night/></dt><dd>3240円(税込)/名</dd>
       </dl>
     </div>
 
     <div class="pb-4">
       <h2 class="h6 text-black-50 font-weight-bold">■ 決済方法</h2>
       <p>
-        立替申請なCandee社員代表者が全員部まとめて立替申請をしてください。費用は給与と一緒に振り込まれます。
+        立替申請可能な代表者1名が、まとめて立替申請してください。費用は給与と一緒に振り込まれます。
       </p>
       <h3 class="h6 mt-2">【領収書の内容】</h3>
       <div class="border p-3" style="width: 18rem;">
