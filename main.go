@@ -54,7 +54,7 @@ func main() {
 	router.POST("/signin", func(c *gin.Context) { handler.SignIn(c) })
 	router.DELETE("/signout", func(c *gin.Context) { handler.SignOut(c) })
 	router.GET("/search/:id", func(c *gin.Context) { handler.Search(c) })
-	router.GET("/images", func(c *gin.Context) { handler.Images(c) })
+	router.GET("/pictures", func(c *gin.Context) { handler.Pictures(c) })
 	router.POST("/upload", func(c *gin.Context) { handler.Upload(c) })
 
 	events := router.Group("/events")

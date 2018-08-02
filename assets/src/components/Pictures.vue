@@ -22,9 +22,9 @@
     </div>
     <div class="row">
       <div class="col">
-        <dl v-for="key in Object.keys(images)" v-bind:key="key" class="mb-3">
+        <dl v-for="key in Object.keys(pictures)" v-bind:key="key" class="mb-3">
           <dt>{{ format(key) }}</dt>
-          <dd v-for="image in images[key]" v-bind:key="image" class="d-inline">
+          <dd v-for="image in pictures[key]" v-bind:key="image" class="d-inline">
             <img v-bind:src="image" height="240" width="auto">
           </dd>
         </dl>
@@ -37,10 +37,10 @@
 import http from '../http';
 
 export default {
-  name: 'Images',
+  name: 'Pictures',
   data: function() {
     return {
-      images: {},      
+      pictures: {},      
       events: [],
       selected: null,
       uploadFileName: 'ファイル選択...',
@@ -52,9 +52,9 @@ export default {
   },
   methods: {
     fetch() {
-      http.get('/images')
+      http.get('/pictures')
         .then((data) => {
-          this.images = data.images;
+          this.pictures = data.pictures;
           this.events = data.events;
         })
         .catch((error) => this.$toasted.show(error));

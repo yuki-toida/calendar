@@ -1,8 +1,8 @@
 <template>
   <div>
     <img src="/static/img/header.jpg" alt="" class="img-thumbnail mb-3">
-    <div v-if="0 < images.length" class="row mb-3">
-      <div v-for="img in images" v-bind:key="img" class="col">
+    <div v-if="0 < pictures.length" class="row mb-3">
+      <div v-for="img in pictures" v-bind:key="img" class="col">
         <img v-bind:src="img" width="auto" height="100">
       </div>
     </div>
@@ -47,6 +47,7 @@
       v-bind:events="events"
       v-bind:startingDayOfWeek="1"
       v-bind:show-date="showDate"
+      v-bind:monthNameFormat="narrow"
       v-on:show-date-change="showDateChange"
       v-on:click-date="clickDate"
       v-on:click-event="clickEvent"
@@ -80,7 +81,7 @@ export default {
       nightRestCouples: null,
       modal: false,
       targetDate: null,
-      images: [],
+      pictures: [],
     }
   },
   created: function() {
@@ -100,7 +101,7 @@ export default {
           this.event = data.event;
           this.dayRestCouples = data.dayRestCouples;
           this.nightRestCouples = data.nightRestCouples;
-          this.images = data.images;
+          this.pictures = data.pictures;
         })
         .catch((error) => this.$toasted.show(error));
     },

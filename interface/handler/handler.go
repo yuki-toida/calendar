@@ -80,14 +80,14 @@ func (h *Handler) Search(c *gin.Context) {
 	})
 }
 
-// Images func
-func (h *Handler) Images(c *gin.Context) {
+// Pictures func
+func (h *Handler) Pictures(c *gin.Context) {
 	id := session.GetID(c)
 	user := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository).Get(id)
 	uc := event.NewUseCase(h.registry.EventRepository)
 	c.JSON(http.StatusOK, gin.H{
-		"images": uc.GetAllImages(),
-		"events": uc.GetUserEvents(user),
+		"pictures": uc.GetAllPictures(),
+		"events":   uc.GetUserEvents(user),
 	})
 }
 
@@ -122,7 +122,7 @@ func (h *Handler) GetEvent(c *gin.Context) {
 		"event":            uc.GetUserEvent(user),
 		"dayRestCouples":   dayRestCouples,
 		"nightRestCouples": nightRestCouples,
-		"images":           uc.GetImages(),
+		"pictures":         uc.GetPictures(),
 	})
 }
 

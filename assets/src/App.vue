@@ -7,7 +7,7 @@
       </router-link>
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <router-link class="nav-link" v-bind:to="{ name: 'Images' }">
+          <router-link class="nav-link" v-bind:to="{ name: 'Pictures' }">
             写真
           </router-link>
         </li>

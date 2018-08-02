@@ -117,8 +117,8 @@ func (u *UseCase) GetRestCouples() (int, int) {
 	return dayRestCouples, nightRestCouples
 }
 
-func countCouples(repository repository.Event, year, month int, category string) int {
-	events := repository.Find(&model.Event{Year: year, Month: month, Category: category})
+func countCouples(r repository.Event, year, month int, category string) int {
+	events := r.Find(&model.Event{Year: year, Month: month, Category: category})
 	eventMap := map[int][]string{}
 	for _, v := range events {
 		if val, ok := eventMap[v.Day]; ok {
@@ -137,8 +137,8 @@ func countCouples(repository repository.Event, year, month int, category string)
 	return result
 }
 
-// GetImages func
-func (u *UseCase) GetImages() []string {
+// GetPictures func
+func (u *UseCase) GetPictures() []string {
 	now := time.Now()
 	year := now.Year()
 	month := int(now.Month())
@@ -155,8 +155,8 @@ func (u *UseCase) GetImages() []string {
 	return results
 }
 
-// GetAllImages func
-func (u *UseCase) GetAllImages() map[time.Time][]string {
+// GetAllPictures func
+func (u *UseCase) GetAllPictures() map[time.Time][]string {
 	events := u.EventRepository.FindAll()
 	rootPath := config.Config.Server.StorageURL + "/" + config.Config.Server.Bucket
 	dict := map[time.Time][]string{}
@@ -193,28 +193,27 @@ func (u *UseCase) CreateEvent(user *model.User, category string, date time.Time)
 	if capacity <= dateCount {
 		return nil, errors.New("すでに満席です")
 	}
-	categoryCount := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, Category: category}))
+
+	countCouples := countCouples(u.EventRepository, year, month, category)
+	var classes string
 	switch category {
 	case categoryDay:
-		if CouplesDay*capacity <= categoryCount {
+		if CouplesDay <= countCouples {
 			return nil, errors.New("昼Knowmeはすでに満席です")
 		}
+		classes = classDay
 	case categoryNight:
-		if CouplesNight*capacity <= categoryCount {
+		if CouplesNight <= countCouples {
 			return nil, errors.New(category + "夜Knowmeはすでに満席です")
 		}
+		classes = classNight
 	}
 
 	if duplicateIds := u.duplicateIds(year, month, date, category, user.ID); 0 < len(duplicateIds) {
 		message := strings.Join(duplicateIds, " ")
 		return nil, errors.New(message + "と既に参加済みです")
 	}
-	var classes string
-	if category == categoryDay {
-		classes = classDay
-	} else {
-		classes = classNight
-	}
+
 	event := &model.Event{
 		Year:      date.Year(),
 		Month:     int(date.Month()),
