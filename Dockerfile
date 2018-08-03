@@ -11,7 +11,10 @@ ENV ENV=dev \
     GOOGLE_APPLICATION_CREDENTIALS="./cred/gcs.json"
 RUN apk update && \
     apk upgrade && \
-    apk add --no-cache ca-certificates
+    apk add --no-cache ca-certificates && \
+    apk add --no-cache tzdata && \
+    cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime && \
+    apk del tzdata
 WORKDIR /opt/app
 COPY --from=builder /go/src/github.com/yuki-toida/knowme/app .
 COPY --from=builder /go/src/github.com/yuki-toida/knowme/config ./config

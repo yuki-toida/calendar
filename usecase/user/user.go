@@ -2,9 +2,7 @@ package user
 
 import (
 	"errors"
-	"fmt"
 	"strings"
-	"time"
 
 	"github.com/yuki-toida/knowme/config"
 	"github.com/yuki-toida/knowme/domain/model"
@@ -53,9 +51,6 @@ func (u *UseCase) SignIn(email, name, photo string) (*model.User, error) {
 
 // Search func
 func (u *UseCase) Search(id string) (*model.User, []*model.UserEvent) {
-	fmt.Println("Local time: ", time.Now())
-	fmt.Println("Tokyo time: ", config.Now)
-
 	all := u.EventRepository.FindAll()
 	events := []*model.Event{}
 	for _, v := range all {

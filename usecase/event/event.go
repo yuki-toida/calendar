@@ -63,8 +63,9 @@ func (u *UseCase) GetUserEvent(user *model.User) *model.UserEvent {
 	if user == nil {
 		return nil
 	}
-	year := config.Now.Year()
-	month := int(config.Now.Month())
+	now := time.Now()
+	year := now.Year()
+	month := int(now.Month())
 
 	events := u.EventRepository.Find(&model.Event{Year: year, Month: month, ID: user.ID})
 	if len(events) <= 0 {
@@ -96,7 +97,7 @@ func (u *UseCase) GetUserEvents(user *model.User) []*model.UserEvent {
 		return results
 	}
 	for _, v := range events {
-		date := time.Date(v.Year, time.Month(v.Month), v.Day, 0, 0, 0, 0, config.JST)
+		date := time.Date(v.Year, time.Month(v.Month), v.Day, 0, 0, 0, 0, time.Local)
 		results = append(results, &model.UserEvent{
 			Date:     date,
 			Category: v.Category,
@@ -108,8 +109,9 @@ func (u *UseCase) GetUserEvents(user *model.User) []*model.UserEvent {
 
 // GetRestCouples func
 func (u *UseCase) GetRestCouples() (int, int) {
-	year := config.Now.Year()
-	month := int(config.Now.Month())
+	now := time.Now()
+	year := now.Year()
+	month := int(now.Month())
 	dayRestCouples := CouplesDay - countCouples(u.EventRepository, year, month, categoryDay)
 	nightRestCouples := CouplesNight - countCouples(u.EventRepository, year, month, categoryNight)
 	return dayRestCouples, nightRestCouples
@@ -137,8 +139,9 @@ func countCouples(r repository.Event, year, month int, category string) int {
 
 // GetPictures func
 func (u *UseCase) GetPictures() []string {
-	year := config.Now.Year()
-	month := int(config.Now.Month())
+	now := time.Now()
+	year := now.Year()
+	month := int(now.Month())
 
 	events := u.EventRepository.Find(&model.Event{Year: year, Month: month})
 	rootPath := config.Config.Server.StorageURL + "/" + config.Config.Server.Bucket
@@ -160,7 +163,7 @@ func (u *UseCase) GetAllPictures() map[time.Time][]string {
 	for _, v := range events {
 		if v.Ext != "" {
 			url := rootPath + fmt.Sprintf("/%d/%d/%d/", v.Year, v.Month, v.Day) + v.Category + v.Ext
-			date := time.Date(v.Year, time.Month(v.Month), 1, 0, 0, 0, 0, config.JST)
+			date := time.Date(v.Year, time.Month(v.Month), 1, 0, 0, 0, 0, time.Local)
 			if val, ok := dict[date]; ok {
 				dict[date] = append(val, url)
 			} else {
@@ -171,9 +174,10 @@ func (u *UseCase) GetAllPictures() map[time.Time][]string {
 	return dict
 }
 
-// CreateEvent func
-func (u *UseCase) CreateEvent(user *model.User, category string, date time.Time) (*model.Event, error) {
-	today := time.Date(config.Now.Year(), config.Now.Month(), config.Now.Day(), 0, 0, 0, 0, config.JST)
+// Create func
+func (u *UseCase) Create(user *model.User, category string, date time.Time) (*model.Event, error) {
+	now := time.Now()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 	if date.Before(today) {
 		return nil, errors.New("過去の登録は出来ません")
 	}

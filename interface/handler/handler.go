@@ -138,7 +138,7 @@ func (h *Handler) CreateEvent(c *gin.Context) {
 		id := session.GetID(c)
 		user := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository).Get(id)
 		uc := event.NewUseCase(h.registry.EventRepository)
-		event, err := uc.CreateEvent(user, params.Category, params.Date.In(config.JST))
+		event, err := uc.Create(user, params.Category, params.Date.In(time.Local))
 		if err != nil {
 			handleError(c, err)
 		} else {
@@ -158,7 +158,7 @@ func (h *Handler) DeleteEvent(c *gin.Context) {
 	} else {
 		id := session.GetID(c)
 		uc := event.NewUseCase(h.registry.EventRepository)
-		event, err := uc.Delete(id, params.Category, params.Date.In(config.JST))
+		event, err := uc.Delete(id, params.Category, params.Date.In(time.Local))
 		if err != nil {
 			handleError(c, err)
 		} else {

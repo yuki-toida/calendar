@@ -2,7 +2,6 @@ package config
 
 import (
 	"os"
-	"time"
 
 	"github.com/BurntSushi/toml"
 )
@@ -26,12 +25,6 @@ var Config struct {
 	}
 }
 
-// JST *time.Location
-var JST *time.Location
-
-// Now time.Time
-var Now time.Time
-
 // Init func
 func Init() {
 	env := os.Getenv("ENV")
@@ -41,7 +34,4 @@ func Init() {
 	}
 	Config.Env = env
 	Config.Domain = domain
-
-	JST = time.FixedZone("JST", 9*60*60)
-	Now = time.Now().In(JST)
 }
