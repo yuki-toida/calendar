@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -23,7 +22,7 @@ func init() {
 }
 
 func main() {
-	connectionString := "root:zaqroot@tcp(" + config.Config.Db.Host + ":" + config.Config.Db.Port + ")/" + config.Config.Db.Name + "?charset=utf8&parseTime=True&loc=Local"
+	connectionString := "root:zaqroot@tcp(" + config.Config.Db.Host + ":" + config.Config.Db.Port + ")/" + config.Config.Db.Name + "?charset=utf8&parseTime=True"
 	db, err := gorm.Open("mysql", connectionString)
 	if err != nil {
 		panic(err.Error())
@@ -40,8 +39,7 @@ func main() {
 	router.LoadHTMLGlob("interface/template/*")
 
 	router.GET("/", func(c *gin.Context) {
-		now := time.Now()
-		revision := fmt.Sprintf("%d%d%d%d%d", now.Year(), int(now.Month()), now.Day(), now.Hour(), now.Minute())
+		revision := fmt.Sprintf("%d%d%d%d%d", config.Now.Year(), int(config.Now.Month()), config.Now.Day(), config.Now.Hour(), config.Now.Minute())
 		c.HTML(http.StatusOK, "index.html", gin.H{
 			"revision": revision,
 		})
