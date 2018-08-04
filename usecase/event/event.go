@@ -22,7 +22,9 @@ const CouplesDay = 4
 // CouplesNight const
 const CouplesNight = 9
 
-const capacity = 3
+// Capacity const
+const Capacity = 3
+
 const categoryDay = "day"
 const categoryNight = "night"
 const classDay = "text-white bg-danger rounded"
@@ -86,27 +88,6 @@ func (u *UseCase) GetUserEvent(user *model.User) *model.UserEvent {
 	}
 }
 
-// GetUserEvents func
-func (u *UseCase) GetUserEvents(user *model.User) []*model.UserEvent {
-	results := []*model.UserEvent{}
-	if user == nil {
-		return results
-	}
-	events := u.EventRepository.Find(&model.Event{ID: user.ID})
-	if len(events) <= 0 {
-		return results
-	}
-	for _, v := range events {
-		date := time.Date(v.Year, time.Month(v.Month), v.Day, 0, 0, 0, 0, time.Local)
-		results = append(results, &model.UserEvent{
-			Date:     date,
-			Category: v.Category,
-			Titles:   []string{},
-		})
-	}
-	return results
-}
-
 // GetRestCouples func
 func (u *UseCase) GetRestCouples() (int, int) {
 	now := time.Now()
@@ -130,7 +111,7 @@ func countCouples(r repository.Event, year, month int, category string) int {
 
 	result := 0
 	for _, v := range eventMap {
-		if capacity <= len(v) {
+		if Capacity <= len(v) {
 			result++
 		}
 	}
@@ -179,18 +160,18 @@ func (u *UseCase) Create(user *model.User, category string, date time.Time) (*mo
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 	if date.Before(today) {
-		return nil, errors.New("過去の登録は出来ません")
+		return nil, errors.New("過去日の登録は出来ません")
 	}
 	year := date.Year()
 	month := int(date.Month())
 	if today.Year() < year || int(today.Month()) < month {
-		return nil, errors.New("未来の登録は出来ません")
+		return nil, errors.New("翌月以降の登録は出来ません")
 	}
 	if 0 < len(u.EventRepository.Find(&model.Event{Year: year, Month: month, ID: user.ID})) {
 		return nil, errors.New("今月は既に登録済みです")
 	}
 	dateCount := len(u.EventRepository.Find(&model.Event{Year: year, Month: month, StartDate: date, Category: category}))
-	if capacity <= dateCount {
+	if Capacity <= dateCount {
 		return nil, errors.New("すでに満席です")
 	}
 
@@ -265,8 +246,14 @@ func (u *UseCase) duplicateIds(year, month int, date time.Time, category, id str
 func (u *UseCase) Delete(id, category string, date time.Time) (*model.Event, error) {
 	event := u.Get(date.Year(), int(date.Month()), date.Day(), category, id)
 	if event == nil {
-		return nil, errors.New("参加していません")
+		return nil, errors.New("登録情報がありません")
 	}
+	now := time.Now()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	if date.Before(today) {
+		return nil, errors.New("過去登録は削除出来ません")
+	}
+
 	u.EventRepository.Delete(event)
 	return event, nil
 }

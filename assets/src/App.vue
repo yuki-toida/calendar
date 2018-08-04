@@ -84,4 +84,24 @@ export default {
 .badge-success {
   background-color: #3fbbb9 !important;
 }
+.cv-header-days {
+  background-color: #aaa;
+  color: white
+}
+.cv-weeks {
+  cursor: pointer;
+}
+.cv-day.past, .cv-day.outsideOfMonth {
+  background-color: #fafafa;
+}
+.custom-file-input:lang(ja) ~ .custom-file-label::after {
+  content: "選択";
+}
+.custom-file {
+  max-width: 20rem;
+  overflow: hidden;
+}
+.custom-file-label {
+  white-space: nowrap;
+}
 </style>

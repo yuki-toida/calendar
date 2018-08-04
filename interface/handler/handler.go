@@ -73,21 +73,20 @@ func (h *Handler) SignOut(c *gin.Context) {
 func (h *Handler) Search(c *gin.Context) {
 	id := c.Param("id")
 	uc := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository)
-	user, events := uc.Search(id)
 	c.JSON(http.StatusOK, gin.H{
-		"user":   user,
-		"events": events,
+		"user":   uc.Get(id),
+		"events": uc.GetEvents(id),
 	})
 }
 
 // Pictures func
 func (h *Handler) Pictures(c *gin.Context) {
 	id := session.GetID(c)
-	user := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository).Get(id)
-	uc := event.NewUseCase(h.registry.EventRepository)
+	uuc := user.NewUseCase(h.registry.UserRepository, h.registry.EventRepository)
+	euc := event.NewUseCase(h.registry.EventRepository)
 	c.JSON(http.StatusOK, gin.H{
-		"pictures": uc.GetAllPictures(),
-		"events":   uc.GetUserEvents(user),
+		"pictures": euc.GetAllPictures(),
+		"events":   uuc.GetEvents(id),
 	})
 }
 

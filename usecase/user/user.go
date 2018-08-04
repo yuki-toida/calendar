@@ -7,6 +7,7 @@ import (
 	"github.com/yuki-toida/knowme/config"
 	"github.com/yuki-toida/knowme/domain/model"
 	"github.com/yuki-toida/knowme/domain/repository"
+	"github.com/yuki-toida/knowme/usecase/event"
 )
 
 // UseCase type
@@ -31,6 +32,34 @@ func (u *UseCase) Get(id string) *model.User {
 	return u.UserRepository.First(id)
 }
 
+// GetEvents func
+func (u *UseCase) GetEvents(id string) []*model.UserEvent {
+	all := u.EventRepository.FindAll()
+	events := []*model.Event{}
+	for _, v := range all {
+		if v.ID == id {
+			events = append(events, v)
+		}
+	}
+	results := []*model.UserEvent{}
+	for _, v := range events {
+		titles := []string{}
+		for _, w := range all {
+			if v.StartDate == w.StartDate && v.Category == w.Category {
+				titles = append(titles, w.Title)
+			}
+		}
+		if event.Capacity <= len(titles) {
+			results = append(results, &model.UserEvent{
+				Date:     v.StartDate,
+				Category: v.Category,
+				Titles:   titles,
+			})
+		}
+	}
+	return results
+}
+
 // SignIn func
 func (u *UseCase) SignIn(email, name, photo string) (*model.User, error) {
 	if email == "" || !strings.Contains(email, config.Config.Domain) {
@@ -47,30 +76,4 @@ func (u *UseCase) SignIn(email, name, photo string) (*model.User, error) {
 		u.UserRepository.Update(user)
 	}
 	return user, nil
-}
-
-// Search func
-func (u *UseCase) Search(id string) (*model.User, []*model.UserEvent) {
-	all := u.EventRepository.FindAll()
-	events := []*model.Event{}
-	for _, v := range all {
-		if v.ID == id {
-			events = append(events, v)
-		}
-	}
-	results := []*model.UserEvent{}
-	for _, v := range events {
-		titles := []string{}
-		for _, w := range all {
-			if v.StartDate == w.StartDate && v.Category == w.Category {
-				titles = append(titles, w.Title)
-			}
-		}
-		results = append(results, &model.UserEvent{
-			Date:     v.StartDate,
-			Category: v.Category,
-			Titles:   titles,
-		})
-	}
-	return u.Get(id), results
 }

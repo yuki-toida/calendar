@@ -136,26 +136,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.custom-file-input:lang(ja) ~ .custom-file-label::after {
-  content: "選択";
-}
-.custom-file {
-  max-width: 20rem;
-  overflow: hidden;
-}
-.custom-file-label {
-  white-space: nowrap;
-}
-.cv-header-days {
-  background-color: #aaa;
-  color: white
-}
-.cv-weeks {
-  cursor: pointer;
-}
-.cv-day.past, .cv-day.outsideOfMonth {
-  background-color: #fafafa;
-}
-</style>
