@@ -16,7 +16,7 @@
       <h2 class="h6 text-black-50 font-weight-bold">■ ルール</h2>
       <ul>
         <li>@candee.co.jpでサインインしてください</li>
-        <li>2部署以上、3人1組(4人以上NG)で登録してください</li>
+        <li>2部署(Department)以上、3人1組(4人以上NG)で登録してください</li>
         <li>1人あたり月1回まで利用可能です</li>
         <li>1度一緒に行った方とは再度行けません</li>
         <li>同日に昼夜1組づつ登録可能です</li>
