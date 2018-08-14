@@ -47,7 +47,7 @@
       <h3 class="h6 mt-2">【領収書の内容】</h3>
       <div class="border p-3" style="width: 18rem;">
         <dl>
-          <dt>宛名</dt><dd>(株)Candee</dd>
+          <dt>宛名</dt><dd>株式会社Candee</dd>
           <dt>料金[昼の場合]</dt><dd>4,860円(税込み)</dd>
           <dt>料金[夜の場合]</dt><dd>9,720円(税込み)</dd>
         </dl>
