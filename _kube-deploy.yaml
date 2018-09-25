@@ -1,17 +1,17 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: knowme-deploy-dev
+  name: knowme-deploy
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: knowme-dev
+        app: knowme
     spec:
       containers:
-      - name: knowme-dev
-        image: asia.gcr.io/planet-pluto-dev/knowme-dev:latest
+      - name: knowme
+        image: asia.gcr.io/planet-pluto-dev/knowme:latest
         ports:
         - containerPort: 8080
         livenessProbe:

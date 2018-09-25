@@ -249,7 +249,7 @@ func (u *UseCase) Delete(id, category string, date time.Time) (*model.Event, err
 		return nil, errors.New("登録情報がありません")
 	}
 	now := time.Now()
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	today := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.Local)
 	if date.Before(today) {
 		return nil, errors.New("過去登録は削除出来ません")
 	}

@@ -1,13 +1,7 @@
 #!/bin/sh
 
-if [ "$1" != "dev" ]; then
-  echo "error. \$1 undefined env (dev)"
-  exit 1
-fi
-
-ENV=$1
-CONTAINER=knowme-$ENV
-REGISTRY=asia.gcr.io/planet-pluto-$ENV
+CONTAINER=knowme
+REGISTRY=asia.gcr.io/planet-pluto-dev
 
 # イメージタグが指定されているか判定
 if [ "$3" != "" ]; then
@@ -23,4 +17,4 @@ else
 fi
 
 # deploy
-kubectl set image deployment/knowme-deploy-$ENV $CONTAINER=$REGISTRY/$IMAGE
+kubectl set image deployment/knowme-deploy $CONTAINER=$REGISTRY/$IMAGE
