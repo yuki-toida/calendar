@@ -1,5 +1,5 @@
-# knowme 
-knowme is calender tools
+# calendar 
+calender tools
 
 ## run / build
 Running local server
